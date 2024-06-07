@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataConcentrator
 {
+    // TODO: change class name
     public class Class1
     {
     }
