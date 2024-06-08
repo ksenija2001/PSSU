@@ -4,14 +4,41 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:oxy="http://oxyplot.org/wpf"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:local="clr-namespace:ScadaGUI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="SCADA"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="18"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"  
+        ScrollViewer.CanContentScroll="True" 
+        WindowStartupLocation="CenterScreen"
+        Width="800"
+        Height="500"
+        Activated="Window_Activated">
+
     <Window.DataContext>
         <local:MainViewModel/>
     </Window.DataContext>
-    <Grid>
-        <Button Content="Hello"/>
-        <oxy:PlotView Model="{Binding MyModel}" />
-    </Grid>
+
+    <StackPanel>
+        <Menu Name="ControlMenu" Margin="10">
+            <Menu.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <DockPanel HorizontalAlignment="Stretch"/>
+                </ItemsPanelTemplate>
+            </Menu.ItemsPanel>
+            <MenuItem Margin="20,0,-30,0" Icon="{materialDesign:PackIcon Kind=Add,Size=18}" ToolTip="Add tag" Foreground="#FFB39DDB" />
+            <MenuItem Margin="20,0,-30,0" Icon="{materialDesign:PackIcon Kind=Database,Size=18}" ToolTip="View tags" Foreground="#FFB39DDB" />
+            <MenuItem Margin="20,0,-30,0" Icon="{materialDesign:PackIcon Kind=Alarm,Size=18}" ToolTip="View alarms" Foreground="#FFB39DDB" />
+        </Menu>
+        <StackPanel Orientation="Horizontal">
+            <oxy:PlotView Model="{Binding MyModel}" Panel.ZIndex="10" Foreground="#FFB39DDB" Height="400" Width="400"/>
+            <ListView Width="100"></ListView>
+        </StackPanel>
+    </StackPanel>
 </Window>

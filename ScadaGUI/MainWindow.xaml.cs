@@ -27,6 +27,11 @@ namespace ScadaGUI
         {
             InitializeComponent();
         }
+
+        private void Window_Activated(object sender, EventArgs e)
+        {
+
+        }
     }
 
 
@@ -38,4 +43,6 @@ namespace ScadaGUI
 
         public PlotModel MyModel { get; private set; }
     }
+
+   
 }
