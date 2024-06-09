@@ -17,28 +17,31 @@
         FontFamily="{DynamicResource MaterialDesignFont}"  
         ScrollViewer.CanContentScroll="True" 
         WindowStartupLocation="CenterScreen"
-        Width="800"
-        Height="500"
+        Width="1000"
+        Height="800"
         Activated="Window_Activated">
 
     <Window.DataContext>
         <local:MainViewModel/>
     </Window.DataContext>
 
-    <StackPanel>
-        <Menu Name="ControlMenu" Margin="10">
+    <DockPanel>
+        <Menu Name="ControlMenu" Margin="10" DockPanel.Dock="Top">
             <Menu.ItemsPanel>
                 <ItemsPanelTemplate>
                     <DockPanel HorizontalAlignment="Stretch"/>
                 </ItemsPanelTemplate>
             </Menu.ItemsPanel>
-            <MenuItem Margin="20,0,-30,0" Icon="{materialDesign:PackIcon Kind=Add,Size=18}" ToolTip="Add tag" Foreground="#FFB39DDB" />
-            <MenuItem Margin="20,0,-30,0" Icon="{materialDesign:PackIcon Kind=Database,Size=18}" ToolTip="View tags" Foreground="#FFB39DDB" />
-            <MenuItem Margin="20,0,-30,0" Icon="{materialDesign:PackIcon Kind=Alarm,Size=18}" ToolTip="View alarms" Foreground="#FFB39DDB" />
+             <MenuItem Margin="20,0,-30,0" Icon="{materialDesign:PackIcon Kind=Database,Size=18}" ToolTip="View tags" Foreground="#FFB39DDB" Click="TagsMenuItem_Click" />
+            <MenuItem Margin="20,0,-30,0" Icon="{materialDesign:PackIcon Kind=Alarm,Size=18}" ToolTip="View alarms" Foreground="#FFB39DDB" Click="AlarmsMenuItem_Click"/>
         </Menu>
-        <StackPanel Orientation="Horizontal">
-            <oxy:PlotView Model="{Binding MyModel}" Panel.ZIndex="10" Foreground="#FFB39DDB" Height="400" Width="400"/>
-            <ListView Width="100"></ListView>
-        </StackPanel>
-    </StackPanel>
+        <Grid DockPanel.Dock="Left" Width="700">
+            <ComboBox Name="tagComboBox" Panel.ZIndex="10" Width="150" BorderThickness="0.5" Margin="0, 30, 30, 0" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Column="1"/>
+            <oxy:PlotView Model="{Binding MyModel}" Panel.ZIndex="0" Height="700" Margin="10,0,10,0" Grid.ColumnSpan="2" />
+        </Grid>
+        <ListView Name="alarmListView" DockPanel.Dock="Right" >
+            <ListViewItem/>
+        </ListView>
+
+    </DockPanel>
 </Window>

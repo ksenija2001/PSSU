@@ -9,6 +9,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -26,9 +27,22 @@ namespace ScadaGUI
         public MainWindow()
         {
             InitializeComponent();
+
         }
 
         private void Window_Activated(object sender, EventArgs e)
+        {
+           
+        }
+
+        private void TagsMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            TagsWindow tags = new TagsWindow();
+            this.Hide();
+            tags.ShowDialog();
+        }
+
+        private void AlarmsMenuItem_Click(object sender, RoutedEventArgs e)
         {
 
         }
@@ -37,7 +51,7 @@ namespace ScadaGUI
 
     public class MainViewModel {
         public MainViewModel() {
-            this.MyModel = new PlotModel { Title = "Example 1" };
+            this.MyModel = new PlotModel { Title = "" };
             this.MyModel.Series.Add(new FunctionSeries(Math.Cos, 0, 10, 0.1, "cos(x)"));
         }
 

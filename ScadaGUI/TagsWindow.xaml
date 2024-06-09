@@ -1,0 +1,51 @@
+﻿<Window x:Class="ScadaGUI.TagsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:local="clr-namespace:ScadaGUI"
+        mc:Ignorable="d"
+        Title="Tags"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="18"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"  
+        ScrollViewer.CanContentScroll="True" 
+        WindowStartupLocation="CenterScreen"
+        Width="1000"
+        Height="800"
+        Activated="Window_Activated" 
+        Closing="Window_Closing">
+    
+    <ScrollViewer Grid.Row="1">
+        <DockPanel>
+            <Menu  Name="ControlMenu" DockPanel.Dock="Top" Margin="10">
+                <Menu.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <DockPanel HorizontalAlignment="Stretch"/>
+                    </ItemsPanelTemplate>
+                </Menu.ItemsPanel>
+                <MenuItem Margin="20,0,-30,0" Icon="{materialDesign:PackIcon Kind=Input, Size=18}" ToolTip="View input tags" Foreground="#FFB39DDB" Click="MenuItemViewInputs_Click"/>
+                <MenuItem Margin="20,0,-30,0" Icon="{materialDesign:PackIcon Kind=Output, Size=18}" ToolTip="View output tags" Foreground="#FFB39DDB" Click="MenuItemViewOutputs_Click"/>
+            </Menu>
+            <DataGrid Name="dataGridTags" DockPanel.Dock="Left" Margin="30" AutoGenerateColumns="True" FontSize="18"  ScrollViewer.CanContentScroll="False" IsReadOnly="True" RowEditEnding="dataGridTags_RowEditEnding" SelectionChanged="dataGridTags_SelectionChanged">
+                <!--<DataGrid.Columns>
+                    <materialDesign:DataGridTextColumn Header="Name" Binding="{Binding Name}" />
+                    <materialDesign:DataGridTextColumn Header="Description" Binding="{Binding Description}" />
+                    <materialDesign:DataGridComboBoxColumn Header="I/O" SelectedValueBinding="{Binding Adress, Mode=TwoWay}" />
+                    <materialDesign:DataGridTextColumn Header="Last scan" Binding="{Binding ScanTime}" />
+                    <materialDesign:DataGridComboBoxColumn Header="Scan" SelectedValueBinding="{Binding Scan, Mode=TwoWay}" />
+                </DataGrid.Columns>-->
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Delete" Icon="{materialDesign:PackIcon Kind=Delete,Size=18}"   Foreground="#FFB39DDB" Click="MenuItemDelete_Click"/>
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
+            </DataGrid>
+        </DockPanel>
+    </ScrollViewer>
+</Window>

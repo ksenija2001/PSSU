@@ -1,0 +1,40 @@
+﻿<Window x:Class="ScadaGUI.AlarmsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:local="clr-namespace:ScadaGUI"
+        mc:Ignorable="d"
+        Title="Alarms"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="18"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"  
+        ScrollViewer.CanContentScroll="True" 
+        WindowStartupLocation="Manual"
+        Width="600"
+        Height="600"
+        Activated="Window_Activated" 
+        Closing="Window_Closing">
+
+    <ScrollViewer Grid.Row="1">
+        <DockPanel>
+            <DataGrid Name="dataGridAlarms" DockPanel.Dock="Left" Margin="30" AutoGenerateColumns="False" FontSize="18"  ScrollViewer.CanContentScroll="False" RowEditEnding="dataGridAlarms_RowEditEnding">
+                <DataGrid.Columns>
+                    <materialDesign:DataGridTextColumn Header="Value" Binding="{Binding Value}" />
+                    <materialDesign:DataGridTextColumn Header="Activate" Binding="{Binding Activate}" />
+                    <materialDesign:DataGridTextColumn Header="Message" Binding="{Binding Message}" />
+                </DataGrid.Columns>
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Delete" Icon="{materialDesign:PackIcon Kind=Delete,Size=18}"   Foreground="#FFB39DDB" Click="MenuItemDelete_Click"/>
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
+            </DataGrid>
+        </DockPanel>
+    </ScrollViewer>
+</Window>
