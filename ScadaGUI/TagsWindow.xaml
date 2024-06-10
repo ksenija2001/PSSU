@@ -32,7 +32,21 @@
                 <MenuItem Margin="20,0,-30,0" Icon="{materialDesign:PackIcon Kind=Input, Size=18}" ToolTip="View input tags" Foreground="#FFB39DDB" Click="MenuItemViewInputs_Click"/>
                 <MenuItem Margin="20,0,-30,0" Icon="{materialDesign:PackIcon Kind=Output, Size=18}" ToolTip="View output tags" Foreground="#FFB39DDB" Click="MenuItemViewOutputs_Click"/>
             </Menu>
-            <DataGrid Name="dataGridTags" DockPanel.Dock="Left" Margin="30" AutoGenerateColumns="True" FontSize="18"  ScrollViewer.CanContentScroll="False" IsReadOnly="True" RowEditEnding="dataGridTags_RowEditEnding" SelectionChanged="dataGridTags_SelectionChanged">
+            <DataGrid Name="dataGridDigitalTags" DockPanel.Dock="Left" Margin="30" AutoGenerateColumns="True" FontSize="18"  ScrollViewer.CanContentScroll="False" IsReadOnly="True" RowEditEnding="dataGridTags_RowEditEnding" SelectionChanged="dataGridTags_SelectionChanged">
+                <DataGrid.Columns>
+                    <materialDesign:DataGridTextColumn Header="Name" Binding="{Binding Name}" />
+                    <materialDesign:DataGridTextColumn Header="Description" Binding="{Binding Description}" />
+                    <materialDesign:DataGridComboBoxColumn Header="I/O" SelectedValueBinding="{Binding Adress, Mode=TwoWay}" />
+                    <materialDesign:DataGridTextColumn Header="Last scan" Binding="{Binding ScanTime}" />
+                    <materialDesign:DataGridComboBoxColumn Header="Scan" SelectedValueBinding="{Binding Scan, Mode=TwoWay}" />
+                </DataGrid.Columns>
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Delete" Icon="{materialDesign:PackIcon Kind=Delete,Size=18}"   Foreground="#FFB39DDB" Click="MenuItemDelete_Click"/>
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
+            </DataGrid>
+            <DataGrid Name="dataGridAnalogTags" DockPanel.Dock="Right" Margin="30" AutoGenerateColumns="True" FontSize="18"  ScrollViewer.CanContentScroll="False" IsReadOnly="True" RowEditEnding="dataGridTags_RowEditEnding" SelectionChanged="dataGridTags_SelectionChanged">
                 <!--<DataGrid.Columns>
                     <materialDesign:DataGridTextColumn Header="Name" Binding="{Binding Name}" />
                     <materialDesign:DataGridTextColumn Header="Description" Binding="{Binding Description}" />

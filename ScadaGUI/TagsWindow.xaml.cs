@@ -64,9 +64,19 @@ namespace ScadaGUI
             if (IO)
             {
                 // TODO check if there is an item in selected row
-                var item = dataGridTags.SelectedItem;
-                AlarmsWindow alarms = new AlarmsWindow(item);
-                alarms.Show();
+                var itemD = dataGridDigitalTags.SelectedItem;
+                var itemA = dataGridAnalogTags.SelectedItem;
+                AlarmsWindow alarms;
+                if (itemD != null)
+                {
+                    alarms = new AlarmsWindow(itemD);
+                    alarms.Show();
+                }
+                else if (itemA != null)
+                {
+                    alarms = new AlarmsWindow(itemA);
+                    alarms.Show();
+                }
             }
         }
     }

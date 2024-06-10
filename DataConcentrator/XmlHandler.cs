@@ -27,17 +27,17 @@ namespace DataConcentrator
         public void SerializeData(DbContext context, string path)
         {
 
-            var DI = context.DI.ToList();
-            var DO = context.DO.ToList();
-            var AI = context.AI.ToList();
-            var AO = context.AO.ToList();
-            var alarms = context.Alarms.ToList();
-            List<Object> list = new List<object>() { DI, DO, AI, AO, alarms };
-            using (XmlWriter writer = XmlWriter.Create(path))
-            {
-                XmlSerializer serializer = new XmlSerializer(list.GetType());
-                serializer.Serialize(writer, list);
-            }
+            //var DI = context.DI.ToList();
+            //var DO = context.DO.ToList();
+            //var AI = context.AI.ToList();
+            //var AO = context.AO.ToList();
+            //var alarms = context.Alarms.ToList();
+            //List<Object> list = new List<object>() { DI, DO, AI, AO, alarms };
+            //using (XmlWriter writer = XmlWriter.Create(path))
+            //{
+            //    XmlSerializer serializer = new XmlSerializer(list.GetType());
+            //    serializer.Serialize(writer, list);
+            //}
         }
 
         public T DeserializeData<T>(DbContext context, string path)
