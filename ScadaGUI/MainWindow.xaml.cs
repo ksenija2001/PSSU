@@ -49,6 +49,7 @@ namespace ScadaGUI
     }
 
 
+    // TO FIX
     public class MainViewModel {
         public MainViewModel() {
             this.MyModel = new PlotModel { Title = "" };
