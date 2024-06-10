@@ -42,7 +42,7 @@ namespace DataConcentrator {
             private string Message { get; set; }
 
             [ForeignKey("Tag")]
-            public int TagId { get; set; }
+            public string TagId { get; set; }
             public virtual Tag Tag { get; set; }
 
         }
@@ -61,7 +61,7 @@ namespace DataConcentrator {
 
             [Required]
             [Range(0, 1)]
-            public sbyte Connected { get; set; }
+            public byte Connected { get; set; }
 
         }
 
@@ -81,7 +81,7 @@ namespace DataConcentrator {
 
             [Required]
             [Range(0, 1)]
-            public sbyte InitialValue { get; set; }
+            public byte InitialValue { get; set; }
         }
 
         public class AI : Tag {
@@ -121,7 +121,7 @@ namespace DataConcentrator {
             public string Units { get; set; }
         }
 
-        public class  InputsOuputsContext : DbContext {
+        public class  IOContext : DbContext {
             public DbSet<Alarm> Alarms { get; set; }
             public DbSet<DI> DIs { get; set; }
             public DbSet<DO> DOs { get; set; }

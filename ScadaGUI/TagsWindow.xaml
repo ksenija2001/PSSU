@@ -29,16 +29,18 @@
                         <DockPanel HorizontalAlignment="Stretch"/>
                     </ItemsPanelTemplate>
                 </Menu.ItemsPanel>
+                <MenuItem Margin="20,0,-30,0" Icon="{materialDesign:PackIcon Kind=Add, Size=18}" ToolTip="Add tag" Foreground="#FFB39DDB" Click="MenuItemCreate_Click"/>
                 <MenuItem Margin="20,0,-30,0" Icon="{materialDesign:PackIcon Kind=Input, Size=18}" ToolTip="View input tags" Foreground="#FFB39DDB" Click="MenuItemViewInputs_Click"/>
                 <MenuItem Margin="20,0,-30,0" Icon="{materialDesign:PackIcon Kind=Output, Size=18}" ToolTip="View output tags" Foreground="#FFB39DDB" Click="MenuItemViewOutputs_Click"/>
             </Menu>
-            <DataGrid Name="dataGridDigitalTags" DockPanel.Dock="Left" Margin="30" AutoGenerateColumns="True" FontSize="18"  ScrollViewer.CanContentScroll="False" IsReadOnly="True" RowEditEnding="dataGridTags_RowEditEnding" SelectionChanged="dataGridTags_SelectionChanged">
+            <DataGrid Name="dataGridDITags" DockPanel.Dock="Top" Margin="30" AutoGenerateColumns="False"  FontSize="18"  ScrollViewer.CanContentScroll="False" SelectionChanged="dataGridTags_SelectionChanged">
                 <DataGrid.Columns>
-                    <materialDesign:DataGridTextColumn Header="Name" Binding="{Binding Name}" />
-                    <materialDesign:DataGridTextColumn Header="Description" Binding="{Binding Description}" />
-                    <materialDesign:DataGridComboBoxColumn Header="I/O" SelectedValueBinding="{Binding Adress, Mode=TwoWay}" />
-                    <materialDesign:DataGridTextColumn Header="Last scan" Binding="{Binding ScanTime}" />
-                    <materialDesign:DataGridComboBoxColumn Header="Scan" SelectedValueBinding="{Binding Scan, Mode=TwoWay}" />
+                    <materialDesign:DataGridTextColumn Header="Name" Binding="{Binding Name, Mode=TwoWay}" />
+                    <materialDesign:DataGridTextColumn Header="Description" Binding="{Binding Description, Mode=TwoWay}" />
+                    <DataGridComboBoxColumn Header="I/O" SelectedItemBinding="{Binding IOAddress, Mode=TwoWay}"  />
+                    <DataGridCheckBoxColumn Header="Connected" Binding="{Binding Connected, Mode=TwoWay}" />
+                    <materialDesign:DataGridTextColumn Header="Last scan" Binding="{Binding ScanTime, Mode=TwoWay}" />
+                    <DataGridComboBoxColumn Header="Scan" x:Name="States" SelectedItemBinding="{Binding ScanStates, Mode=TwoWay}" />
                 </DataGrid.Columns>
                 <DataGrid.ContextMenu>
                     <ContextMenu>
@@ -46,7 +48,7 @@
                     </ContextMenu>
                 </DataGrid.ContextMenu>
             </DataGrid>
-            <DataGrid Name="dataGridAnalogTags" DockPanel.Dock="Right" Margin="30" AutoGenerateColumns="True" FontSize="18"  ScrollViewer.CanContentScroll="False" IsReadOnly="True" RowEditEnding="dataGridTags_RowEditEnding" SelectionChanged="dataGridTags_SelectionChanged">
+            <DataGrid  Name="dataGridAITags" DockPanel.Dock="Bottom" Margin="30" AutoGenerateColumns="True" FontSize="18"  ScrollViewer.CanContentScroll="False" IsReadOnly="True" SelectionChanged="dataGridTags_SelectionChanged">
                 <!--<DataGrid.Columns>
                     <materialDesign:DataGridTextColumn Header="Name" Binding="{Binding Name}" />
                     <materialDesign:DataGridTextColumn Header="Description" Binding="{Binding Description}" />
