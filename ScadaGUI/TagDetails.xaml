@@ -23,8 +23,8 @@
                 </TextBlock>
       
             <StackPanel Margin="5, 10, 0, 0" Orientation="Horizontal" HorizontalAlignment="Center" >
-                <RadioButton Padding="5" Name="rbDI" Content="DI" Foreground="{DynamicResource MaterialDesignColumnHeader}" Checked="rbDI_Checked" IsChecked="True"/>
-                <RadioButton Padding="5" Name="rbAI" Content="AI" Foreground="{DynamicResource MaterialDesignColumnHeader}" Checked="rbAI_Checked"/>
+                <RadioButton Padding="5" Name="rbDI" Content="DI" Foreground="{DynamicResource MaterialDesignColumnHeader}" Checked="rbDI_Checked" IsChecked="True" Click="rbDI_Clicked"/>
+                <RadioButton Padding="5" Name="rbAI" Content="AI" Foreground="{DynamicResource MaterialDesignColumnHeader}" Checked="rbAI_Checked" Click="rbAI_Clicked"/>
             </StackPanel>
             <Separator Style="{StaticResource MaterialDesignLightSeparator}" Background="LightGray" />
             <StackPanel Name="TextBoxPanel" Margin="0 20 0 0">
