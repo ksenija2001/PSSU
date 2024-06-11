@@ -7,6 +7,7 @@
         xmlns:local="clr-namespace:ScadaGUI"
         mc:Ignorable="d"
         Title="Alarms"
+        WindowStyle="None"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
         TextElement.FontSize="18"
