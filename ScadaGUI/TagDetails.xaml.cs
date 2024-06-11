@@ -197,5 +197,11 @@ namespace ScadaGUI
                 Control.ClearValue(Border.BackgroundProperty);
             }
         }
+
+        private void On_KeyDown(object sender, KeyEventArgs e) {
+            if (e.Key == Key.Enter) {
+                Save_Click(sender, e);
+            }
+        }
     }
 }

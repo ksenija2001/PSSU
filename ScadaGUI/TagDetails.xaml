@@ -15,7 +15,7 @@
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="{DynamicResource MaterialDesignFont}" 
         Width="450" 
-        Height="700" >
+        Height="700" PreviewKeyDown="On_KeyDown" >
     <materialDesign:Card Width="400" Height="600" Padding="19" Margin="0 20 0 0" >
         <StackPanel>
                 <TextBlock Margin="16 16 12 8" FontSize="16" HorizontalAlignment="Center">
