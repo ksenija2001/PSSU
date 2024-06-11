@@ -1,7 +1,9 @@
-﻿using Microsoft.Xaml.Behaviors.Layout;
+﻿using DataConcentrator;
+using Microsoft.Xaml.Behaviors.Layout;
 using OxyPlot;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Validation;
 using System.Linq;
 using System.Text;
@@ -22,54 +24,75 @@ namespace ScadaGUI
     /// </summary>
     public partial class TagDetails : Window
     {
-        public TagDetails()
+        private string Mode {  get; set; }
+        public TagDetails(string mode)
         {
             InitializeComponent();
+
+            cmbAddress.ItemsSource = new List<string>
+            {
+                "ADDR001",
+                "ADDR002",
+                "ADDR003",
+                "ADDR004",
+            };
 
             txtLow.IsEnabled = false;
             txtHigh.IsEnabled = false;
             txtUnits.IsEnabled = false;
-
+            Mode = mode;
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                //Museum museum = new Museum();
+                if (rbDI.IsChecked == true)
+                {
+                    DBModel.DI tag = new DBModel.DI();
+                    tag.Name = txtName.Text.Trim();
+                    tag.Description = txtDescription.Text.Trim();
+                    tag.IOAddress = cmbAddress.Text.Trim();
+                    tag.Connected = (ckbConnected.IsChecked == true) ? (byte)1 : (byte)0;
+                    tag.ScanTime = double.Parse(txtScanTime.Text.Trim());
+                    tag.ScanState = (ckbScanState.IsChecked == true) ? (byte)1 : (byte)0;
+                    tag.Alarms = new List<DBModel.Alarm>();
 
-                //museum.Name = txtName.Text.Trim();
-                //museum.Type = txtType.Text.Trim();
-                //string city = txtCity.Text.Trim();
+                    using (DBModel.IOContext context = new DBModel.IOContext())
+                    {
+                        if (Mode == "Create")
+                            DBTagHandler.Create(context, tag);
+                        else if (Mode == "Update")
+                            DBTagHandler.Update(context, tag);
+                    }
+                }
+                else if (rbAI.IsChecked == true)
+                {
+                    DBModel.AI tag = new DBModel.AI();
+                    tag.Name = txtName.Text.Trim();
+                    tag.Description = txtDescription.Text.Trim();
+                    tag.IOAddress = cmbAddress.Text.Trim();
+                    tag.Connected = (ckbConnected.IsChecked == true) ? (byte)1 : (byte)0;
+                    tag.ScanTime = double.Parse(txtScanTime.Text.Trim());
+                    tag.ScanState = (ckbScanState.IsChecked == true) ? (byte)1 : (byte)0;
+                    tag.LowLimit = double.Parse(txtLow.Text.Trim());
+                    tag.HighLimit = double.Parse(txtHigh.Text.Trim());
+                    tag.Units = txtUnits.Text.Trim();
+                    tag.Alarms = new List<DBModel.Alarm>();
 
-
-                //int n = 0;
-                //museum.Id = int.TryParse(txtID.Text.Trim(), out n) ? n : -1;
-                //float k = 0;
-
-                //museum.Price = float.TryParse(txtPrice.Text.Trim(), out k) ? k : -1;
-                //museum.Visitors = float.TryParse(txtVisitors.Text.Trim(), out k) ? k : -1;
-                //museum.Rating = float.TryParse(txtRating.Text.Trim(), out k) ? k : -1;
-
-
-                //using (MuseumContext context = new MuseumContext())
-                //{
-                //    var id = int.Parse(context.Cities.Where(c => c.Name == city).Select(c => c.Id).FirstOrDefault().ToString());
-                //    if (id == 0)
-                //    {
-                //        MessageBox.Show("City doesn't exist");
-                //        return;
-                //    }
-
-                //    museum.CityId = id;
-
-                //    if (Mode == "Create")
-                //        MuseumHandler.Create(context, museum);
-                //    else if (Mode == "Update")
-                //        MuseumHandler.Update(context, Museum.Id, museum);
-
-                // }
-
+                    using (DBModel.IOContext context = new DBModel.IOContext())
+                    {
+                        if (Mode == "Create")
+                            DBTagHandler.Create(context, tag);
+                        else if (Mode == "Update")
+                            DBTagHandler.Update(context, tag);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Type of input not selected");
+                    return;
+                }
 
                 this.Close();
             }

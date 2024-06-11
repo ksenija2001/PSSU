@@ -16,12 +16,8 @@ namespace DataConcentrator {
         EQUALS
     }
 
-    public enum ScanState {
-        ON,
-        OFF
-    }
-
     public class DBModel {
+
 
         public class Alarm {
 
@@ -47,7 +43,9 @@ namespace DataConcentrator {
 
         }
 
-        public class Tag {
+        public abstract class Tag {
+
+            [DatabaseGenerated(DatabaseGeneratedOption.None)]
 
             [Key]
             public string Name { get; set; }
@@ -67,14 +65,18 @@ namespace DataConcentrator {
 
         public class DI : Tag {
 
+
             [Required]
             public double ScanTime { get; set; }
 
             [Required]
-            [EnumDataType(typeof(ScanState))]
-            public ScanState ScanState { get; set; }
+            [Range(0, 1)]
+            public byte ScanState { get; set; }
 
             public virtual List<Alarm> Alarms { get; set; }
+
+
+
         }
 
         public class DO : Tag {
@@ -90,7 +92,8 @@ namespace DataConcentrator {
             public double ScanTime { get; set; }
 
             [Required]
-            public ScanState ScanState { get; set; }
+            [Range(0, 1)]
+            public byte ScanState { get; set; }
 
             [Required]
             public double LowLimit { get; set; }
@@ -123,10 +126,41 @@ namespace DataConcentrator {
 
         public class  IOContext : DbContext {
             public DbSet<Alarm> Alarms { get; set; }
-            public DbSet<DI> DIs { get; set; }
-            public DbSet<DO> DOs { get; set; }
-            public DbSet<AI> AIs { get; set; }
-            public DbSet<AO> AOs { get; set; }
+            public DbSet<Tag> Tags { get; set; }
+
+            //public DbSet<DI> DIs { get; set; }
+            //public DbSet<DO> DOs { get; set; }
+            //public DbSet<AI> AIs { get; set; }
+            //public DbSet<AO> AOs { get; set; }
+
+            protected override void OnModelCreating(DbModelBuilder modelBuilder)
+            {
+                modelBuilder.Entity<DI>().Map(m =>
+                {
+                    m.MapInheritedProperties();
+                    m.ToTable("DIs");
+                });
+
+                modelBuilder.Entity<AI>().Map(m =>
+                {
+                    m.MapInheritedProperties();
+                    m.ToTable("AIs");
+                });
+
+                modelBuilder.Entity<DO>().Map(m =>
+                {
+                    m.MapInheritedProperties();
+                    m.ToTable("DOs");
+                });
+
+                modelBuilder.Entity<AO>().Map(m =>
+                {
+                    m.MapInheritedProperties();
+                    m.ToTable("AOs");
+                });
+            }
         }
+
     }
 }
+
