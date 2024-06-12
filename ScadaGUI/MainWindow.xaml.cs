@@ -15,6 +15,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using OxyPlot;
 using OxyPlot.Series;
+using DataConcentrator;
+using System.Xml.Serialization;
+using System.Data.Entity;
 
 
 namespace ScadaGUI
@@ -27,6 +30,11 @@ namespace ScadaGUI
         public MainWindow()
         {
             InitializeComponent();
+
+            using(DBModel.IOContext context = new DBModel.IOContext())
+            {
+                context.Configuration.ProxyCreationEnabled = false;
+            }
 
         }
 
@@ -45,6 +53,12 @@ namespace ScadaGUI
         private void AlarmsMenuItem_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            using (DBModel.IOContext context = new DBModel.IOContext())
+                XmlHandler.SerializeData(context, @"../../Configuration.xml");
         }
     }
 

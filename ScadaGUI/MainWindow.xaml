@@ -19,7 +19,7 @@
         WindowStartupLocation="CenterScreen"
         Width="1000"
         Height="800"
-        Activated="Window_Activated">
+        Activated="Window_Activated" Closed="Window_Closed">
 
     <Window.DataContext>
         <local:MainViewModel/>

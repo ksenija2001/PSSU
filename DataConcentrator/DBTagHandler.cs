@@ -6,6 +6,7 @@ using System.Runtime.Remoting.Contexts;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Xml.Linq;
 using static DataConcentrator.DBModel;
 
@@ -15,19 +16,19 @@ namespace DataConcentrator
     {
         public static void Create(DBModel.IOContext context, Object obj)
         {
-            if (obj.GetType() == typeof(DBModel.DI))
+            if (obj is DBModel.DI)
             {
                 context.Tags.Add((DBModel.DI)obj);
             }
-            else if (obj.GetType() == typeof(DBModel.AI))
+            else if (obj is DBModel.AI)
             {
                 context.Tags.Add((DBModel.AI)obj);
             }
-            else if (obj.GetType() == typeof(DBModel.DO))
+            else if (obj is DBModel.DO)
             {
                 context.Tags.Add((DBModel.DO)obj);
             }
-            else if (obj.GetType() == typeof(DBModel.AO))
+            else if (obj is DBModel.AO)
             {
                 context.Tags.Add((DBModel.AO)obj);
             }
@@ -41,31 +42,44 @@ namespace DataConcentrator
             if (obj != null)
             {
                 string name = ((DBModel.Tag)((Object)obj)).Name;
-                var item = context.Tags.Where(n => n.Name == name).FirstOrDefault();
-                if (obj.GetType() == typeof(DBModel.DI))
+                if (obj is DBModel.DI)
                 {
-                    item = (DBModel.DI)obj;
+                    DBModel.DI item = (DBModel.DI)context.Tags.Where(n => n.Name == name).FirstOrDefault();
+
+                    item.Connected = ((DBModel.DI)obj).Connected;
+                    item.ScanState = ((DBModel.DI)obj).ScanState;
+                    item.IOAddress = ((DBModel.DI)obj).IOAddress;
                 }
-                else if (obj.GetType() == typeof(DBModel.AI))
+                else if (obj is DBModel.AI)
                 {
-                    item = (DBModel.AI)obj;
+                    DBModel.AI item = (DBModel.AI)context.Tags.Where(n => n.Name == name).FirstOrDefault();
+
+                    item.Connected = ((DBModel.AI)obj).Connected;
+                    item.ScanState = ((DBModel.AI)obj).ScanState;
+                    item.IOAddress = ((DBModel.AI)obj).IOAddress;
                 }
-                else if (obj.GetType() == typeof(DBModel.DO))
+                else if (obj is DBModel.DO)
                 {
-                    item = (DBModel.DO)obj;
+                    DBModel.DO item = (DBModel.DO)context.Tags.Where(n => n.Name == name).FirstOrDefault();
+
+                    item.Connected = ((DBModel.DO)obj).Connected;
+                    item.IOAddress = ((DBModel.DO)obj).IOAddress;
                 }
-                else if (obj.GetType() == typeof(DBModel.AO))
+                else if (obj is DBModel.AO)
                 {
-                    item = (DBModel.AO)obj;
+                    DBModel.AO item = (DBModel.AO)context.Tags.Where(n => n.Name == name).FirstOrDefault();
+
+                    item.Connected = ((DBModel.AO)obj).Connected;
+                    item.IOAddress = ((DBModel.AO)obj).IOAddress;
                 }
             
                 context.SaveChanges();
-                MessageBox.Show($"{obj.GetType()} updated successfully");
+                MessageBox.Show($"{name} updated successfully");
 
             }
             else
             {
-                MessageBox.Show($"{obj.GetType()} doesn't exist");
+                MessageBox.Show($"Object doesn't exist");
             }
         }
 
@@ -102,7 +116,7 @@ namespace DataConcentrator
             {
                 //var item = ReadById(context, obj);
 
-                if (obj.GetType() == typeof(DBModel.DI))
+                if (obj is DBModel.DI)
                 {
                     context.Tags.Remove((DBModel.DI)obj);
 
@@ -111,7 +125,7 @@ namespace DataConcentrator
                         //TODO delete alarms
                     }
                 }
-                else if (obj.GetType() == typeof(DBModel.AI))
+                else if (obj is DBModel.AI)
                 {
                     context.Tags.Remove((DBModel.AI)obj);
 
@@ -120,11 +134,11 @@ namespace DataConcentrator
                         //TODO delete alarms
                     }
                 }
-                else if (obj.GetType() == typeof(DBModel.DO))
+                else if (obj is DBModel.DO)
                 {
                     context.Tags.Remove((DBModel.DO)obj);
                 }
-                else if (obj.GetType() == typeof(DBModel.AO))
+                else if (obj is DBModel.AO)
                 {
                     context.Tags.Remove((DBModel.AO)obj);
                 }

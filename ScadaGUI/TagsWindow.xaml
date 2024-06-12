@@ -16,9 +16,8 @@
         FontFamily="{DynamicResource MaterialDesignFont}"  
         ScrollViewer.CanContentScroll="True" 
         WindowStartupLocation="CenterScreen"
-        Width="1000"
-        Height="800"
-        Activated="Window_Activated" 
+        Width="1100"
+        Height="900"
         Closing="Window_Closing">
     
     <ScrollViewer Grid.Row="1">
@@ -29,18 +28,21 @@
                         <DockPanel HorizontalAlignment="Stretch"/>
                     </ItemsPanelTemplate>
                 </Menu.ItemsPanel>
-                <MenuItem Margin="20,0,-30,0" Icon="{materialDesign:PackIcon Kind=Add, Size=18}" ToolTip="Add tag" Foreground="#FFB39DDB" Click="MenuItemCreate_Click"/>
-                <MenuItem Margin="20,0,-30,0" Icon="{materialDesign:PackIcon Kind=Input, Size=18}" ToolTip="View input tags" Foreground="#FFB39DDB" Click="MenuItemViewInputs_Click"/>
-                <MenuItem Margin="20,0,-30,0" Icon="{materialDesign:PackIcon Kind=Output, Size=18}" ToolTip="View output tags" Foreground="#FFB39DDB" Click="MenuItemViewOutputs_Click"/>
+                <MenuItem Margin="20,0,-30,0" Width="50"  Icon="{materialDesign:PackIcon Kind=Add, Size=18}" ToolTip="Add tag" Foreground="#FFB39DDB" Click="MenuItemCreate_Click"/>
+                <MenuItem Margin="20,0,-30,0" Width="50" Icon="{materialDesign:PackIcon Kind=Input, Size=18}" ToolTip="View input tags" Foreground="#FFB39DDB" Click="MenuItemViewInputs_Click"/>
+                <MenuItem Margin="20,0,-30,0" Width="50" Icon="{materialDesign:PackIcon Kind=Output, Size=18}" ToolTip="View output tags" Foreground="#FFB39DDB" Click="MenuItemViewOutputs_Click"/>
+                <MenuItem Margin="50,0,-30,0" Width="50" Icon="{materialDesign:PackIcon Kind=Undo, Size=18}" ToolTip="View output tags" Foreground="#FFB39DDB" Click="MenuItemBack_Click" HorizontalAlignment="Left"/>
+
             </Menu>
-            <DataGrid Name="dataGridDITags" DockPanel.Dock="Top" Margin="30" AutoGenerateColumns="True"  FontSize="18"  ScrollViewer.CanContentScroll="False" SelectionChanged="dataGridD_SelectionChanged" AutoGeneratingColumn="dataGrid_AutoGeneratingColumn" IsReadOnly="True">
+            <DataGrid Name="dataGridDITags" DockPanel.Dock="Top" Margin="30" AutoGenerateColumns="True"  FontSize="18"  ScrollViewer.CanContentScroll="False" SelectionChanged="dataGridD_SelectionChanged" AutoGeneratingColumn="dataGrid_AutoGeneratingColumn" IsReadOnly="False" CellEditEnding="dataGridDITags_CellEditEnding">
+   
                 <DataGrid.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Delete" Icon="{materialDesign:PackIcon Kind=Delete,Size=18}"   Foreground="#FFB39DDB" Click="MenuItemDelete_Click"/>
                     </ContextMenu>
                 </DataGrid.ContextMenu>
             </DataGrid>
-            <DataGrid  Name="dataGridAITags" DockPanel.Dock="Bottom" Margin="30" AutoGenerateColumns="True" FontSize="18"  ScrollViewer.CanContentScroll="False" IsReadOnly="True" SelectionChanged="dataGridA_SelectionChanged" AutoGeneratingColumn="dataGrid_AutoGeneratingColumn">
+            <DataGrid  Name="dataGridAITags" DockPanel.Dock="Bottom" Margin="30" AutoGenerateColumns="True" FontSize="18"  ScrollViewer.CanContentScroll="False" IsReadOnly="False" SelectionChanged="dataGridA_SelectionChanged" AutoGeneratingColumn="dataGrid_AutoGeneratingColumn" CellEditEnding="dataGridAITags_CellEditEnding">
                 <DataGrid.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Delete" Icon="{materialDesign:PackIcon Kind=Delete,Size=18}"   Foreground="#FFB39DDB" Click="MenuItemDelete_Click"/>
