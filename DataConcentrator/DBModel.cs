@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.Data.Entity;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.Collections;
+using System.Xml.Serialization;
 
 namespace DataConcentrator {
 
@@ -29,13 +31,13 @@ namespace DataConcentrator {
 
             [Required]
             [EnumDataType(typeof(ActiveWhen))]
-            private ActiveWhen Activate { get; set; }
+            public ActiveWhen Activate { get; set; }
 
             [Required]
             public DateTime AlarmTime { get; set; }
 
             [Required]
-            private string Message { get; set; }
+            public string Message { get; set; }
 
             [ForeignKey("Tag")]
             public string TagId { get; set; }
@@ -43,7 +45,8 @@ namespace DataConcentrator {
 
         }
 
-        public abstract class Tag {
+        public abstract class Tag
+        {
 
             [DatabaseGenerated(DatabaseGeneratedOption.None)]
 
@@ -63,6 +66,7 @@ namespace DataConcentrator {
 
         }
 
+        [XmlInclude(typeof(DI))]
         public class DI : Tag {
 
 
@@ -79,12 +83,16 @@ namespace DataConcentrator {
 
         }
 
+        [XmlInclude(typeof(DO))]
+
         public class DO : Tag {
 
             [Required]
             [Range(0, 1)]
             public byte InitialValue { get; set; }
         }
+
+        [XmlInclude(typeof(AI))]
 
         public class AI : Tag {
 
@@ -107,6 +115,8 @@ namespace DataConcentrator {
 
             public virtual List<Alarm> Alarms { get; set; }
         }
+
+        [XmlInclude(typeof(AO))]
 
         public class AO : Tag {
 
@@ -135,6 +145,7 @@ namespace DataConcentrator {
 
             protected override void OnModelCreating(DbModelBuilder modelBuilder)
             {
+
                 modelBuilder.Entity<DI>().Map(m =>
                 {
                     m.MapInheritedProperties();
