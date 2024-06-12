@@ -23,8 +23,7 @@ namespace ScadaGUI
     /// Interaction logic for TagDetails.xaml
     /// </summary>
     public partial class TagDetails : Window {
-        private string Mode { get; set; }
-        public TagDetails(string mode) {
+        public TagDetails() {
             InitializeComponent();
 
             cmbAddress.ItemsSource = new List<string>
@@ -38,7 +37,6 @@ namespace ScadaGUI
             txtLow.IsEnabled = false;
             txtHigh.IsEnabled = false;
             txtUnits.IsEnabled = false;
-            Mode = mode;
         }
 
         private void Save_Click(object sender, RoutedEventArgs e) {
@@ -55,10 +53,7 @@ namespace ScadaGUI
                         tag.Alarms = new List<DBModel.Alarm>();
 
                         using (DBModel.IOContext context = new DBModel.IOContext()) {
-                            if (Mode == "Create")
-                                DBTagHandler.Create(context, tag);
-                            else if (Mode == "Update")
-                                DBTagHandler.Update(context, tag);
+                            DBTagHandler.Create(context, tag);
                         }
                     }
                     else if (rbAI.IsChecked == true) {
@@ -75,10 +70,7 @@ namespace ScadaGUI
                         tag.Alarms = new List<DBModel.Alarm>();
 
                         using (DBModel.IOContext context = new DBModel.IOContext()) {
-                            if (Mode == "Create")
                                 DBTagHandler.Create(context, tag);
-                            else if (Mode == "Update")
-                                DBTagHandler.Update(context, tag);
                         }
                     }
                     else {
@@ -202,6 +194,11 @@ namespace ScadaGUI
             if (e.Key == Key.Enter) {
                 Save_Click(sender, e);
             }
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+
         }
     }
 }
