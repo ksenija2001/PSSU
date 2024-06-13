@@ -91,6 +91,9 @@
     <Compile Include="TagDetails.xaml.cs">
       <DependentUpon>TagDetails.xaml</DependentUpon>
     </Compile>
+    <Compile Include="TagOutputDetails.xaml.cs">
+      <DependentUpon>TagOutputDetails.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TagsWindow.xaml.cs">
       <DependentUpon>TagsWindow.xaml</DependentUpon>
     </Compile>
@@ -111,6 +114,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="TagDetails.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TagOutputDetails.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

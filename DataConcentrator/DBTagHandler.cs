@@ -46,6 +46,8 @@ namespace DataConcentrator
                 {
                     DBModel.DI item = (DBModel.DI)context.Tags.Where(n => n.Name == name).FirstOrDefault();
 
+                    item.Description = ((DBModel.DI)obj).Description;
+                    item.ScanTime = ((DBModel.DI)obj).ScanTime;
                     item.Connected = ((DBModel.DI)obj).Connected;
                     item.ScanState = ((DBModel.DI)obj).ScanState;
                     item.IOAddress = ((DBModel.DI)obj).IOAddress;
@@ -54,6 +56,11 @@ namespace DataConcentrator
                 {
                     DBModel.AI item = (DBModel.AI)context.Tags.Where(n => n.Name == name).FirstOrDefault();
 
+                    item.Description = ((DBModel.AI)obj).Description;
+                    item.ScanTime = ((DBModel.AI)obj).ScanTime;
+                    item.HighLimit = ((DBModel.AI)obj).HighLimit;
+                    item.LowLimit = ((DBModel.AI)obj).LowLimit;
+                    item.Units = ((DBModel.AI)obj).Units;
                     item.Connected = ((DBModel.AI)obj).Connected;
                     item.ScanState = ((DBModel.AI)obj).ScanState;
                     item.IOAddress = ((DBModel.AI)obj).IOAddress;
@@ -62,6 +69,8 @@ namespace DataConcentrator
                 {
                     DBModel.DO item = (DBModel.DO)context.Tags.Where(n => n.Name == name).FirstOrDefault();
 
+                    item.Description = ((DBModel.DO)obj).Description;
+                    item.InitialValue = ((DBModel.DO)obj).InitialValue;
                     item.Connected = ((DBModel.DO)obj).Connected;
                     item.IOAddress = ((DBModel.DO)obj).IOAddress;
                 }
@@ -69,6 +78,11 @@ namespace DataConcentrator
                 {
                     DBModel.AO item = (DBModel.AO)context.Tags.Where(n => n.Name == name).FirstOrDefault();
 
+                    item.Description = ((DBModel.AO)obj).Description;
+                    item.InitialValue = ((DBModel.AO)obj).InitialValue;
+                    item.HighLimit = ((DBModel.AO)obj).HighLimit;
+                    item.LowLimit = ((DBModel.AO)obj).LowLimit;
+                    item.Units = ((DBModel.AO)obj).Units;
                     item.Connected = ((DBModel.AO)obj).Connected;
                     item.IOAddress = ((DBModel.AO)obj).IOAddress;
                 }

@@ -20,7 +20,8 @@
         Width="600"
         Height="600"
         Activated="Window_Activated" 
-        Closing="Window_Closing">
+        Closing="Window_Closing"
+        Left="0">
 
     <ScrollViewer Grid.Row="1">
         <DockPanel>
