@@ -15,9 +15,9 @@
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="{DynamicResource MaterialDesignFont}" 
         Width="550" 
-        Height="800" PreviewKeyDown="On_KeyDown" 
+        Height="600" PreviewKeyDown="On_KeyDown" 
         WindowStartupLocation="CenterScreen" Closed="Window_Closed">
-    <materialDesign:Card Width="450" Height="700" Padding="19" Margin="0 20 0 0" >
+    <materialDesign:Card Width="450" Height="500" Padding="19" Margin="0 20 0 0" >
         <StackPanel>
             <TextBlock Margin="16 16 12 8" FontSize="18" HorizontalAlignment="Center">
                     Alarm details
@@ -25,10 +25,11 @@
 
             <Separator Style="{StaticResource MaterialDesignLightSeparator}" Background="LightGray" />
             <StackPanel Name="TextBoxPanel" Margin="5 0 5 0">
-                <TextBox  Padding="5" Margin="10" Name="txtId" materialDesign:HintAssist.Hint="Id" Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
-                <TextBox Padding="5" Margin="10" Name="txtValue" materialDesign:HintAssist.Hint="Value" Style="{StaticResource MaterialDesignFloatingHintTextBox}"  />
+                <DockPanel>
+                    <TextBox Width="200" DockPanel.Dock="Left" Padding="5" Margin="10" Name="txtValue" materialDesign:HintAssist.Hint="Value" Style="{StaticResource MaterialDesignFloatingHintTextBox}"  />
+                    <CheckBox Padding="10" Margin="10" Name="ckbValue" Content="Value" Foreground="{DynamicResource MaterialDesignColumnHeader}" Style="{StaticResource MaterialDesignAccentCheckBox}" DockPanel.Dock="Right" HorizontalAlignment="Center"/>
+                </DockPanel>
                 <ComboBox Margin="10" Padding="5" Name="cmbActivate" materialDesign:HintAssist.Hint="ActivationOn"/>
-
                 <TextBox Height="150" TextWrapping="Wrap" AcceptsReturn="True" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Padding="5" Margin="10" Name="txtMessage" materialDesign:HintAssist.Hint="Message" Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
 
                 <Separator Style="{StaticResource MaterialDesignLightSeparator}" Background="LightGray" />
