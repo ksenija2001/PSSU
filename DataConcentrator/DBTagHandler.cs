@@ -49,16 +49,20 @@ namespace DataConcentrator
                 if (obj is DBModel.DI)
                 {
                     DBModel.DI item = (DBModel.DI)context.Tags.Where(n => n.Name == name).FirstOrDefault();
+                    var temp = item.Alarms;
 
                     item.Description = ((DBModel.DI)obj).Description;
                     item.ScanTime = ((DBModel.DI)obj).ScanTime;
                     item.Connected = ((DBModel.DI)obj).Connected;
                     item.ScanState = ((DBModel.DI)obj).ScanState;
                     item.IOAddress = ((DBModel.DI)obj).IOAddress;
+                    //item.Alarms = ((DBModel.DI)obj).Alarms.ToList();
+
                 }
                 else if (obj is DBModel.AI)
                 {
                     DBModel.AI item = (DBModel.AI)context.Tags.Where(n => n.Name == name).FirstOrDefault();
+                    var temp = item.Alarms;
 
                     item.Description = ((DBModel.AI)obj).Description;
                     item.ScanTime = ((DBModel.AI)obj).ScanTime;
@@ -68,6 +72,8 @@ namespace DataConcentrator
                     item.Connected = ((DBModel.AI)obj).Connected;
                     item.ScanState = ((DBModel.AI)obj).ScanState;
                     item.IOAddress = ((DBModel.AI)obj).IOAddress;
+
+                    //item.Alarms = ((DBModel.AI)obj).Alarms.ToList();
                 }
                 else if (obj is DBModel.DO)
                 {
@@ -137,10 +143,6 @@ namespace DataConcentrator
 
                     context.Tags.Remove(item);
 
-                    foreach(DBModel.Alarm alarm in ((DBModel.DI)obj).Alarms)
-                    {
-                        DBAlarmHandler.Delete(context, alarm.Id);
-                    }
                 }
                 else if (obj is DBModel.AI)
                 {
@@ -148,10 +150,6 @@ namespace DataConcentrator
 
                     context.Tags.Remove(item);
 
-                    foreach (DBModel.Alarm alarm in ((DBModel.AI)obj).Alarms)
-                    {
-                        DBAlarmHandler.Delete(context, alarm.Id);
-                    }
                 }
                 else if (obj is DBModel.DO)
                 {
