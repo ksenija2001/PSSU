@@ -27,15 +27,11 @@ namespace ScadaGUI
     public partial class TagsWindow : Window
     {
         private bool IO {  get; set; }
-        private int LastSelectedD {  get; set; }
-        private int LastSelectedA { get; set; }
 
         private AlarmsWindow alarms {  get; set; }
         public TagsWindow()
         {
             IO = true;
-            LastSelectedD = -2;
-            LastSelectedA = -2;
 
             InitializeComponent();
             RefreshSources();
@@ -88,73 +84,51 @@ namespace ScadaGUI
 
         private void MenuItemDelete_Click(object sender, RoutedEventArgs e)
         {
+            var menuItem = (MenuItem)sender;
+            var contextMenu = (ContextMenu)menuItem.Parent;
+            var item = ((DataGrid)contextMenu.PlacementTarget).SelectedItem;
 
-        }
+            var response = MessageBox.Show($"Do you really want to permenantly delete {((DBModel.Tag)item).Name}?", "Question?", MessageBoxButton.YesNo);
 
-        private void dataGridA_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-   
-            var itemA = dataGridAITags.SelectedItem;
-            if (itemA != null && LastSelectedA != dataGridAITags.SelectedIndex)
+            if (response == MessageBoxResult.Yes)
             {
-                LastSelectedA = dataGridAITags.SelectedIndex;
-                if (IO)
+                using (DBModel.IOContext context = new DBModel.IOContext())
                 {
-                    List<DBModel.Alarm> a = new List<DBModel.Alarm>();
-                    using (DBModel.IOContext context = new DBModel.IOContext())
-                    {
-                        string name = ((DBModel.Tag)itemA).Name;
-                        var temp = context.Tags.Where(n => n.Name == name).FirstOrDefault();
-                        a = ((DBModel.AI)temp).Alarms;
-                    }
-
-                    if (alarms != null)
-                        alarms.Close();
-                    alarms = new AlarmsWindow(a);
-                    alarms.Show();
+                    DBTagHandler.Delete(context, item);
+                    RefreshSources();
                 }
-                else if (alarms != null)
-                    alarms.Close();
             }
-            else if (LastSelectedA != dataGridAITags.SelectedIndex)
-            {
-                LastSelectedA = -2;
-            }
-
         }
 
-        private void dataGridD_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void MenuItemAlarm_Click(object sender, RoutedEventArgs e)
         {
-            var itemD = dataGridDITags.SelectedItem;
-
-            if (itemD != null && LastSelectedD != dataGridDITags.SelectedIndex)
+            var menuItem = (MenuItem)sender;
+            var contextMenu = (ContextMenu)menuItem.Parent;
+            var data = (DataGrid)contextMenu.PlacementTarget;
+            if (data.SelectedCells.Count > 0)
             {
-                LastSelectedD = dataGridDITags.SelectedIndex;
-                if (IO)
+                var item = data.SelectedCells[0].Item;
+                string name = ((DBModel.Tag)item).Name;
+
+                List<DBModel.Alarm> alarmList = new List<DBModel.Alarm>();
+                using (DBModel.IOContext context = new DBModel.IOContext())
                 {
-                    List<DBModel.Alarm> a = new List<DBModel.Alarm>();
-                    using (DBModel.IOContext context = new DBModel.IOContext())
-                    {
-                        string name = ((DBModel.Tag)itemD).Name;
-                        var temp = context.Tags.Where(n => n.Name == name).FirstOrDefault();
-                        a = ((DBModel.DI)temp).Alarms;
-                    }
-
-                    if (alarms != null)
-                        alarms.Close();
-                    alarms = new AlarmsWindow(a);
-                    alarms.Show();
+                    var temp = context.Tags.Where(n => n.Name == name).FirstOrDefault();
+                    if (data == dataGridAITags)
+                        alarmList = ((DBModel.AI)temp).Alarms;
+                    else
+                        alarmList = ((DBModel.DI)temp).Alarms;
                 }
-                else if (alarms != null)
-                    alarms.Close();
-            }
-            else if (LastSelectedD != dataGridDITags.SelectedIndex)
-            {
-                LastSelectedD = -2;
-            }
 
+                if (alarms != null)
+                    alarms.Close();
+                alarms = new AlarmsWindow(alarmList, name);
+                alarms.Show();
+            }
+            
         }
 
+      
         private void MenuItemCreate_Click(object sender, RoutedEventArgs e)
         {
             if (IO)

@@ -19,7 +19,7 @@
         WindowStartupLocation="CenterScreen" Closed="Window_Closed">
     <materialDesign:Card Width="450" Height="700" Padding="19" Margin="0 20 0 0" >
         <StackPanel>
-                <TextBlock Margin="16 16 12 8" FontSize="16" HorizontalAlignment="Center">
+                <TextBlock Margin="16 16 12 8" FontSize="18" HorizontalAlignment="Center">
                     Input Tag details
                 </TextBlock>
       

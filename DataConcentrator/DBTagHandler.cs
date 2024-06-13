@@ -32,9 +32,13 @@ namespace DataConcentrator
             {
                 context.Tags.Add((DBModel.AO)obj);
             }
+            else
+            {
+                MessageBox.Show("[ERROR] Tag couldn't be added");
+            }
 
             context.SaveChanges();
-            MessageBox.Show($"New {obj.GetType()} added to database");
+            MessageBox.Show($"[INFO] New {obj.GetType().BaseType} tag added to database");
         }
 
         public static void Update(DBModel.IOContext context, Object obj)
@@ -88,82 +92,87 @@ namespace DataConcentrator
                 }
             
                 context.SaveChanges();
-                MessageBox.Show($"{name} updated successfully");
+                MessageBox.Show($"[INFO] Update of tag {name} successful");
 
             }
             else
             {
-                MessageBox.Show($"Object doesn't exist");
+                MessageBox.Show($"[ERROR] Tag doesn't exist");
             }
         }
 
-        public static T ReadById<T>(DBModel.IOContext context, T obj)
-        {
-            string name = ((DBModel.Tag)((Object)obj)).Name;
-
-            if (typeof(T) == typeof(DBModel.DI))
-            {
-                return (T) Convert.ChangeType(context.Tags.Where(n => n.Name == name).FirstOrDefault(), typeof(T));
-            }
-            else if (typeof(T) == typeof(DBModel.AI))
-            {
-                return (T)Convert.ChangeType(context.Tags.Where(n => n.Name == name).FirstOrDefault(), typeof(T));
-            }
-            else if (typeof(T) == typeof(DBModel.DO))
-            {
-                return (T)Convert.ChangeType(context.Tags.Where(n => n.Name == name).FirstOrDefault(), typeof(T));
-            }
-            else if (typeof(T) == typeof(DBModel.AO))
-            {
-                return (T) Convert.ChangeType(context.Tags.Where(n => n.Name == name).FirstOrDefault(), typeof(T));
-            }
-            else
-            {
-                return default(T);
-            }
-        }
+        //public static T ReadByName<T>(DBModel.IOContext context, string name)
+        //{
+        //    if (typeof(T) == typeof(DBModel.DI))
+        //    {
+        //        return (T)context.Tags.Where(n => n.Name == name).FirstOrDefault();
+        //    }
+        //    else if (typeof(T) == typeof(DBModel.AI))
+        //    {
+        //        return (T)Convert.ChangeType(context.Tags.Where(n => n.Name == name).FirstOrDefault(), typeof(T));
+        //    }
+        //    else if (typeof(T) == typeof(DBModel.DO))
+        //    {
+        //        return (T)Convert.ChangeType(context.Tags.Where(n => n.Name == name).FirstOrDefault(), typeof(T));
+        //    }
+        //    else if (typeof(T) == typeof(DBModel.AO))
+        //    {
+        //        return (T)Convert.ChangeType(context.Tags.Where(n => n.Name == name).FirstOrDefault(), typeof(T));
+        //    }
+        //    else
+        //    {
+        //        return default(T);
+        //    }
+        //}
 
 
         public static void Delete(DBModel.IOContext context, Object obj)
         {
-            if (obj == null)
-            {
-                //var item = ReadById(context, obj);
-
+            try 
+            { 
+                string name = ((DBModel.Tag)obj).Name;
                 if (obj is DBModel.DI)
                 {
-                    context.Tags.Remove((DBModel.DI)obj);
+                    DBModel.DI item = (DBModel.DI)context.Tags.Where(n => n.Name == name).FirstOrDefault();
+
+                    context.Tags.Remove(item);
 
                     foreach(DBModel.Alarm alarm in ((DBModel.DI)obj).Alarms)
                     {
-                        //TODO delete alarms
+                        DBAlarmHandler.Delete(context, alarm.Id);
                     }
                 }
                 else if (obj is DBModel.AI)
                 {
-                    context.Tags.Remove((DBModel.AI)obj);
+                    DBModel.AI item = (DBModel.AI)context.Tags.Where(n => n.Name == name).FirstOrDefault();
+
+                    context.Tags.Remove(item);
 
                     foreach (DBModel.Alarm alarm in ((DBModel.AI)obj).Alarms)
                     {
-                        //TODO delete alarms
+                        DBAlarmHandler.Delete(context, alarm.Id);
                     }
                 }
                 else if (obj is DBModel.DO)
                 {
-                    context.Tags.Remove((DBModel.DO)obj);
+                    DBModel.DO item = (DBModel.DO)context.Tags.Where(n => n.Name == name).FirstOrDefault();
+
+                    context.Tags.Remove(item);
                 }
                 else if (obj is DBModel.AO)
                 {
-                    context.Tags.Remove((DBModel.AO)obj);
+                    DBModel.AO item = (DBModel.AO)context.Tags.Where(n => n.Name == name).FirstOrDefault();
+
+                    context.Tags.Remove(item);
                 }
 
                 context.SaveChanges();
-                MessageBox.Show($"{obj.GetType()} deleted successfully");
+                MessageBox.Show($"[INFO] Tag {name} deleted successfully");
 
             }
-            else
+            catch
             {
-                MessageBox.Show($"{obj.GetType()} doesn't exist");
+                MessageBox.Show($"[ERROR] Tag doesn't exist");
             }
 
         }
