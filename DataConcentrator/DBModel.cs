@@ -9,8 +9,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using System.Collections;
 using System.Xml.Serialization;
-using static DataConcentrator.DBModel;
-using static DataConcentrator.DBAlarm.DBModel;
 
 namespace DataConcentrator {
 
@@ -36,7 +34,7 @@ namespace DataConcentrator {
 
             [ForeignKey("Tag")]
             public string TagId { get; set; }
-            public virtual Tag Tag { get; set; }
+            public virtual DBModel.Tag Tag { get; set; }
 
         }
 

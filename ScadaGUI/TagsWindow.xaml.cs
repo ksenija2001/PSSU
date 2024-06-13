@@ -26,6 +26,8 @@ namespace ScadaGUI
     /// </summary>
     public partial class TagsWindow : Window
     {
+        // IO = true -> inputs
+        // IO = false -> outputs
         private bool IO {  get; set; }
 
         private AlarmsWindow alarms {  get; set; }

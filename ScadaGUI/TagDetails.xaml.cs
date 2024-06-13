@@ -49,6 +49,7 @@ namespace ScadaGUI
                         using (DBModel.IOContext context = new DBModel.IOContext()) {
                             DBTagHandler.Create(context, tag);
                         }
+                        PLCDataHandler.StartScanner(tag.Name);
                     }
                     else if (rbAI.IsChecked == true) {
                         DBModel.AI tag = new DBModel.AI();
@@ -66,6 +67,7 @@ namespace ScadaGUI
                         using (DBModel.IOContext context = new DBModel.IOContext()) {
                                 DBTagHandler.Create(context, tag);
                         }
+                        PLCDataHandler.StartScanner(tag.Name);
                     }
                     else {
                         MessageBox.Show("Type of input not selected");

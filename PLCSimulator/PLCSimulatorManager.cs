@@ -132,9 +132,15 @@ namespace PLCSimulator
             t2.Abort();
         }
 
-        public Dictionary<string, double> GetData() {
+        public Dictionary<string, double> GetAllData() {
             lock (locker) {
                 return addressValues;
+            }
+        }
+
+        public double GetDataForAddress(string addr) {
+            lock (locker) {
+                return addressValues[addr];
             }
         }
     }
