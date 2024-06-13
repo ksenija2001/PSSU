@@ -102,7 +102,7 @@ namespace ScadaGUI
         {
             var menuItem = (MenuItem)sender;
             var contextMenu = (ContextMenu)menuItem.Parent;
-            var item = ((DataGrid)contextMenu.PlacementTarget).SelectedItem;
+            var item = ((DataGrid)contextMenu.PlacementTarget).SelectedCells[0].Item;
 
             var response = MessageBox.Show($"Do you really want to permenantly delete {((DBModel.Tag)item).Name}?", "Question?", MessageBoxButton.YesNo);
 
