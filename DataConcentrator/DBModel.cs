@@ -10,6 +10,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Collections;
 using System.Xml.Serialization;
 using static DataConcentrator.DBModel;
+using static DataConcentrator.DBAlarm.DBModel;
 
 namespace DataConcentrator {
 
@@ -38,9 +39,15 @@ namespace DataConcentrator {
             public virtual Tag Tag { get; set; }
 
         }
+
+        public class IOContext : DbContext
+        {
+            public DbSet<Alarm> Alarms { get; set; }
+
+        }
     }
 
-    public class DBModel {
+        public class DBModel {
 
         [XmlInclude(typeof(DBModel.Alarm))]
         public class Alarm {
@@ -146,13 +153,7 @@ namespace DataConcentrator {
         }
 
         public class  IOContext : DbContext {
-            public DbSet<Alarm> Alarms { get; set; }
             public DbSet<Tag> Tags { get; set; }
-
-            //public DbSet<DI> DIs { get; set; }
-            //public DbSet<DO> DOs { get; set; }
-            //public DbSet<AI> AIs { get; set; }
-            //public DbSet<AO> AOs { get; set; }
 
             protected override void OnModelCreating(DbModelBuilder modelBuilder)
             {
