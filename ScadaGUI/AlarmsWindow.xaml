@@ -31,8 +31,8 @@
                     </ItemsPanelTemplate>
                 </Menu.ItemsPanel>
                 <MenuItem Margin="20,0,-30,0" Width="50"  Icon="{materialDesign:PackIcon Kind=Add, Size=18}" ToolTip="Add tag" Foreground="#FFB39DDB" Click="MenuItemCreate_Click"/>
-                <MenuItem Margin="50,0,-30,0" Width="50" Icon="{materialDesign:PackIcon Kind=Undo, Size=18}" ToolTip="View output tags" Foreground="#FFB39DDB" Click="MenuItemBack_Click" HorizontalAlignment="Left"/>
-                <Label Name="lblTitle" FontSize="18" HorizontalAlignment="Right" Foreground="{DynamicResource MaterialDesignColumnHeader}"> Alarms for tag </Label>
+                <MenuItem Margin="50,0, 0,0" Width="50" Icon="{materialDesign:PackIcon Kind=Undo, Size=18}" ToolTip="View output tags" Foreground="#FFB39DDB" Click="MenuItemBack_Click" HorizontalAlignment="Left"/>
+                <Label  Name="lblTitle" FontSize="18" Foreground="{DynamicResource MaterialDesignColumnHeader}"> Alarms for tag </Label>
             </Menu>
 
             <DataGrid Name="dataGridAlarms" SelectionUnit="Cell" SelectionMode="Single" DockPanel.Dock="Left"  CanUserAddRows="False" Margin="30" AutoGenerateColumns="False" FontSize="18"  ScrollViewer.CanContentScroll="False" IsReadOnly="False" CellEditEnding="dataGrid_CellEditEnding">
