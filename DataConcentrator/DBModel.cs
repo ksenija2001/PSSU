@@ -121,7 +121,7 @@ namespace DataConcentrator {
         public class AO : Tag {
 
             [Required]
-            public bool InitialValue { get; set; }
+            public double InitialValue { get; set; }
 
             [Required]
             public double LowLimit { get; set; }

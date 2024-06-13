@@ -7,7 +7,6 @@
         xmlns:local="clr-namespace:ScadaGUI"
         mc:Ignorable="d"
         Title="Alarms"
-        WindowStyle="None"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
         TextElement.FontSize="18"
@@ -20,15 +19,29 @@
         Width="600"
         Height="600"
         Activated="Window_Activated" 
-        Closing="Window_Closing">
+        Closing="Window_Closing"
+        Left="0">
 
     <ScrollViewer Grid.Row="1">
         <DockPanel>
-            <DataGrid Name="dataGridAlarms" DockPanel.Dock="Left" Margin="30" AutoGenerateColumns="False" FontSize="18"  ScrollViewer.CanContentScroll="False" RowEditEnding="dataGridAlarms_RowEditEnding">
+            <Menu  Name="ControlMenu" DockPanel.Dock="Top" Margin="10">
+                <Menu.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <DockPanel HorizontalAlignment="Stretch"/>
+                    </ItemsPanelTemplate>
+                </Menu.ItemsPanel>
+                <MenuItem Margin="20,0,-30,0" Width="50"  Icon="{materialDesign:PackIcon Kind=Add, Size=18}" ToolTip="Add tag" Foreground="#FFB39DDB" Click="MenuItemCreate_Click"/>
+                <MenuItem Margin="50,0,-30,0" Width="50" Icon="{materialDesign:PackIcon Kind=Undo, Size=18}" ToolTip="View output tags" Foreground="#FFB39DDB" Click="MenuItemBack_Click" HorizontalAlignment="Left"/>
+                <Label Name="lblTitle" FontSize="18" HorizontalAlignment="Right" Foreground="{DynamicResource MaterialDesignColumnHeader}"> Alarms for tag </Label>
+            </Menu>
+
+            <DataGrid Name="dataGridAlarms" SelectionUnit="Cell" SelectionMode="Single" DockPanel.Dock="Left"  CanUserAddRows="False" Margin="30" AutoGenerateColumns="False" FontSize="18"  ScrollViewer.CanContentScroll="False" IsReadOnly="False" CellEditEnding="dataGrid_CellEditEnding">
                 <DataGrid.Columns>
-                    <materialDesign:DataGridTextColumn Header="Value" Binding="{Binding Value}" />
-                    <materialDesign:DataGridTextColumn Header="Activate" Binding="{Binding Activate}" />
-                    <materialDesign:DataGridTextColumn Header="Message" Binding="{Binding Message}" />
+                    <DataGridTextColumn IsReadOnly="True" Header="ID" Binding="{Binding Id}" />
+                    <DataGridTextColumn Header="Value" Binding="{Binding Value}" />
+                    <DataGridComboBoxColumn Header="Activate" SelectedItemBinding="{Binding Activate}" />
+                    <DataGridTextColumn IsReadOnly="True" Header="Last alarm" Binding="{Binding AlarmTime}" />
+                    <DataGridTextColumn Header="Message" Binding="{Binding Message}" />
                 </DataGrid.Columns>
                 <DataGrid.ContextMenu>
                     <ContextMenu>
