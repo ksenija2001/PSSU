@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DBAlarmHandler.cs" />
     <Compile Include="DBTagHandler.cs" />
     <Compile Include="DBModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

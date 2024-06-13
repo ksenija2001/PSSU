@@ -1,4 +1,4 @@
-﻿<Window x:Class="ScadaGUI.TagDetails"
+﻿<Window x:Class="ScadaGUI.TagOutputDetails"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ScadaGUI"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"  
         mc:Ignorable="d"
-        Title="TagDetails"
+        Title="TagOutputDetails"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
         TextElement.FontSize="18"
@@ -19,13 +19,13 @@
         WindowStartupLocation="CenterScreen" Closed="Window_Closed">
     <materialDesign:Card Width="450" Height="700" Padding="19" Margin="0 20 0 0" >
         <StackPanel>
-                <TextBlock Margin="16 16 12 8" FontSize="18" HorizontalAlignment="Center">
-                    Input Tag details
-                </TextBlock>
-      
+            <TextBlock Margin="16 16 12 8" FontSize="16" HorizontalAlignment="Center">
+                    Output Tag details
+            </TextBlock>
+
             <StackPanel Margin="5, 10, 0, 0" Orientation="Horizontal" HorizontalAlignment="Center" >
-                <RadioButton Padding="5" Name="rbDI" Content="DI" Foreground="{DynamicResource MaterialDesignColumnHeader}" Checked="rbDI_Checked" IsChecked="True" Click="rbDI_Clicked"/>
-                <RadioButton Padding="5" Name="rbAI" Content="AI" Foreground="{DynamicResource MaterialDesignColumnHeader}" Checked="rbAI_Checked" Click="rbAI_Clicked"/>
+                <RadioButton Padding="5" Name="rbDI" Content="DO" Foreground="{DynamicResource MaterialDesignColumnHeader}" Checked="rbDI_Checked" IsChecked="True" Click="rbDI_Clicked"/>
+                <RadioButton Padding="5" Name="rbAI" Content="AO" Foreground="{DynamicResource MaterialDesignColumnHeader}" Checked="rbAI_Checked" Click="rbAI_Clicked"/>
             </StackPanel>
             <Separator Style="{StaticResource MaterialDesignLightSeparator}" Background="LightGray" />
             <StackPanel Name="TextBoxPanel" Margin="5 0 5 0">
@@ -36,8 +36,8 @@
                     <CheckBox Padding="10" Margin="10" Name="ckbConnected" Content="Connected" Foreground="{DynamicResource MaterialDesignColumnHeader}" Style="{StaticResource MaterialDesignAccentCheckBox}" DockPanel.Dock="Right" HorizontalAlignment="Right"/>
                 </DockPanel>
                 <DockPanel>
-                    <TextBox Width="200" Margin="10" Padding="5" Name="txtScanTime" DockPanel.Dock="Left" materialDesign:HintAssist.Hint="ScanTime" Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
-                    <CheckBox Padding="10" Margin="12" Name="ckbScanState" Content="Scan state" Foreground="{DynamicResource MaterialDesignColumnHeader}" Style="{StaticResource MaterialDesignAccentCheckBox}" DockPanel.Dock="Right" HorizontalAlignment="Right"/>
+                    <TextBox Width="200" Margin="10" Padding="5" Name="txtInitialValue" DockPanel.Dock="Left" materialDesign:HintAssist.Hint="Initial value" Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
+                    <CheckBox Padding="10" Margin="12" Name="ckbInitialValue" Content="Initial value" Foreground="{DynamicResource MaterialDesignColumnHeader}" Style="{StaticResource MaterialDesignAccentCheckBox}" DockPanel.Dock="Right" HorizontalAlignment="Right"/>
                 </DockPanel>
                 <TextBox Padding="5" Margin="10" Name="txtLow" materialDesign:HintAssist.Hint="Low" Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
                 <TextBox Padding="5" Margin="10" Name="txtHigh" materialDesign:HintAssist.Hint="High" Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
