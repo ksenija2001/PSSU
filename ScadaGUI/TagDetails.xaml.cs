@@ -26,13 +26,7 @@ namespace ScadaGUI
         public TagDetails() {
             InitializeComponent();
 
-            cmbAddress.ItemsSource = new List<string>
-            {
-                "ADDR001",
-                "ADDR002",
-                "ADDR003",
-                "ADDR004",
-            };
+            cmbAddress.ItemsSource = PLCDataHandler.PLCData.Keys.Skip(8).Take(4);
 
             txtLow.IsEnabled = false;
             txtHigh.IsEnabled = false;
@@ -101,9 +95,14 @@ namespace ScadaGUI
                 txtUnits.IsEnabled = false;
             }
 
+            if (cmbAddress != null) {
+                cmbAddress.ItemsSource = PLCDataHandler.PLCData.Keys.Skip(8).Take(4);
+            }
+
         }
 
         private void rbAI_Checked(object sender, RoutedEventArgs e) {
+            cmbAddress.ItemsSource = PLCDataHandler.PLCData.Keys.Take(4);
             txtLow.IsEnabled = true;
             txtHigh.IsEnabled = true;
             txtUnits.IsEnabled = true;

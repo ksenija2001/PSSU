@@ -131,5 +131,11 @@ namespace PLCSimulator
             t1.Abort();
             t2.Abort();
         }
+
+        public Dictionary<string, double> GetData() {
+            lock (locker) {
+                return addressValues;
+            }
+        }
     }
 }
