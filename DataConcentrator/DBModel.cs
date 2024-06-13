@@ -9,6 +9,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using System.Collections;
 using System.Xml.Serialization;
+using static DataConcentrator.DBModel;
+using static DataConcentrator.DBAlarm.DBModel;
 
 namespace DataConcentrator {
 
@@ -18,20 +20,13 @@ namespace DataConcentrator {
         EQUALS
     }
 
-    public class DBModel {
-
-
-        public class Alarm {
-
+    public class DBAlarm
+    {
+        [XmlInclude(typeof(DBAlarm.Alarm))]
+        public class Alarm
+        {
             [Key]
             public int Id { get; set; }
-
-            [Required]
-            public double Value { get; set; }
-
-            [Required]
-            [EnumDataType(typeof(ActiveWhen))]
-            public ActiveWhen Activate { get; set; }
 
             [Required]
             public DateTime AlarmTime { get; set; }
@@ -43,6 +38,29 @@ namespace DataConcentrator {
             public string TagId { get; set; }
             public virtual Tag Tag { get; set; }
 
+        }
+
+        public class IOContext : DbContext
+        {
+            public DbSet<Alarm> Alarms { get; set; }
+
+        }
+    }
+
+        public class DBModel {
+
+        [XmlInclude(typeof(DBModel.Alarm))]
+        public class Alarm {
+
+            [Required]
+            public double Value { get; set; }
+
+            [Required]
+            [EnumDataType(typeof(ActiveWhen))]
+            public ActiveWhen Activate { get; set; }
+
+            [Required]
+            public string Message { get; set; }
         }
 
         public abstract class Tag
@@ -77,7 +95,7 @@ namespace DataConcentrator {
             [Range(0, 1)]
             public byte ScanState { get; set; }
 
-            public virtual List<Alarm> Alarms { get; set; }
+            public List<Alarm> Alarms { get; set; }
 
 
 
@@ -113,7 +131,7 @@ namespace DataConcentrator {
             [StringLength(5, MinimumLength = 1)]
             public string Units { get; set; }
 
-            public virtual List<Alarm> Alarms { get; set; }
+            public List<Alarm> Alarms { get; set; }
         }
 
         [XmlInclude(typeof(AO))]
@@ -135,13 +153,7 @@ namespace DataConcentrator {
         }
 
         public class  IOContext : DbContext {
-            public DbSet<Alarm> Alarms { get; set; }
             public DbSet<Tag> Tags { get; set; }
-
-            //public DbSet<DI> DIs { get; set; }
-            //public DbSet<DO> DOs { get; set; }
-            //public DbSet<AI> AIs { get; set; }
-            //public DbSet<AO> AOs { get; set; }
 
             protected override void OnModelCreating(DbModelBuilder modelBuilder)
             {
