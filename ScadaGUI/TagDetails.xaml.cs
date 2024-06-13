@@ -126,6 +126,7 @@ namespace ScadaGUI
             }
             else {
                 cmbAddress.ClearValue(Border.BackgroundProperty);
+                cmbAddress.ClearValue(TextBox.ToolTipProperty);
             }
 
             //checking additional fields
@@ -147,6 +148,7 @@ namespace ScadaGUI
             }
 
             Box.ClearValue(Border.BackgroundProperty);
+            Box.ClearValue(TextBox.ToolTipProperty);
             return false;
         }
 
@@ -154,9 +156,9 @@ namespace ScadaGUI
             double parsed_value;
 
             if (Double.TryParse(Box.Text, out parsed_value)) {
-                if (parsed_value <= 0) {
+                if ((Box != txtLow && parsed_value == 0) || parsed_value < 0 ) {
                     Box.Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#FFB39DDB");
-                    Box.ToolTip = Box.Name.Replace("txt", "") + " field must be greater than zero!";
+                    Box.ToolTip = Box.Name.Replace("txt", "") + " field must be positive!";
                     return true;
                 }
             }
@@ -167,6 +169,7 @@ namespace ScadaGUI
             }
 
             Box.ClearValue(Border.BackgroundProperty);
+            Box.ClearValue(TextBox.ToolTipProperty);
             return false;
 
         }
@@ -187,6 +190,7 @@ namespace ScadaGUI
                     }
                 }
                 Control.ClearValue(Border.BackgroundProperty);
+                Control.ClearValue(TextBox.ToolTipProperty);
             }
         }
 
