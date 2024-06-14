@@ -411,5 +411,13 @@ namespace ScadaGUI
             }
         
         }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            if (alarms != null)
+                alarms.Close();
+            Application.Current.MainWindow.Show();
+            this.Close();
+        }
     }
 }

@@ -59,19 +59,19 @@ namespace ScadaGUI
 
                     using (DBModel.IOContext context = new DBModel.IOContext())
                     {
+                        var DItags = context.Tags.OfType<DBModel.DI>().ToList();
+                        var AItags = context.Tags.OfType<DBModel.AI>().ToList();
+                        List<List<DBModel.Alarm>> alarms = DItags.Select(n => n.Alarms).ToList();
+                        alarms.AddRange(AItags.Select(n => n.Alarms));
+                        List<int> ids = alarms.Where(list => list.Count > 0).Select(list => list.Max(a => a.Id)).ToList();
+                        if (ids.Count == 0)
+                            alarm.Id = 1;
+                        else
+                            alarm.Id = ids.Max() + 1;
+
                         if (tagType == typeof(DBModel.DI))
                         {
-                            var DItags = context.Tags.OfType<DBModel.DI>().ToList();
                             tag = DItags.Where(n => n.Name == tagName).FirstOrDefault();
-
-                            List<List<DBModel.Alarm>> alarms = DItags.Select(n => n.Alarms).ToList();
-                     
-                            List<int> ids = alarms.Where(list => list.Count > 0).Select(list => list.Max(a => a.Id)).ToList();
-                            if (ids.Count == 0)
-                                alarm.Id = 1;
-                            else
-                                alarm.Id = ids.Max() + 1;
-                              
                             alarm.Value = (ckbValue.IsChecked == true) ? (byte)1 : (byte)0;
                             ((DBModel.DI)tag).Alarms.Add(alarm);
                             DBTagHandler.Update(context, (DBModel.DI)tag);
@@ -79,15 +79,7 @@ namespace ScadaGUI
                         }
                         else
                         {
-                            var AItags = context.Tags.OfType<DBModel.AI>().ToList();
                             tag = AItags.Where(n => n.Name == tagName).FirstOrDefault();
-
-                            List<List<DBModel.Alarm>> alarms = AItags.Select(n => n.Alarms).ToList();
-                            List<int> ids = alarms.Where(list => list.Count > 0).Select(list => list.Max(a => a.Id)).ToList();
-                            if (ids.Count == 0)
-                                alarm.Id = 1;
-                            else
-                                alarm.Id = ids.Max() + 1;
                             alarm.Value = double.Parse(txtValue.Text.Trim());
                             ((DBModel.AI)tag).Alarms.Add(alarm);
                             DBTagHandler.Update(context, (DBModel.AI)tag);

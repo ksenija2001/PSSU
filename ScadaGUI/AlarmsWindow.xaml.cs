@@ -36,7 +36,7 @@ namespace ScadaGUI
             using (DBModel.IOContext context = new DBModel.IOContext())
             {
                 var data = context.Tags.Where(n => n.Name == tagName).FirstOrDefault();
-                if (data.GetType() == typeof(DBModel.AI))
+                if (data.GetType().BaseType == typeof(DBModel.AI))
                     tagType = typeof(DBModel.AI);
                 else
                     tagType = typeof(DBModel.DI);

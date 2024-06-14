@@ -18,7 +18,7 @@
         WindowStartupLocation="CenterScreen"
         Width="1100"
         Height="900"
-        Closing="Window_Closing">
+        Closed="Window_Closed">
     
     <ScrollViewer Grid.Row="1">
         <DockPanel>
