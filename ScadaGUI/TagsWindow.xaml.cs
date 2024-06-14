@@ -232,15 +232,12 @@ namespace ScadaGUI
                     string name = ((DBModel.Tag)e.EditingElement.DataContext).Name;
                     DBModel.Tag item;
 
-                    using (DBModel.IOContext context = new DBModel.IOContext()) {
-                        var DItags = context.Tags.OfType<DBModel.DI>().ToList();
-                        var alarms = DItags.Select(n => n.Alarms).ToList();
-
+                    using (DBModel.IOContext context = new DBModel.IOContext())
+                    {
                         if (IO)
-                            item = (DBModel.DI)context.Tags.Where(n => n.Name == name).FirstOrDefault();
+                            item = context.Tags.OfType<DBModel.DI>().Where(n => n.Name == name).FirstOrDefault();
                         else
-                            item = (DBModel.DO)context.Tags.Where(n => n.Name == name).FirstOrDefault();
-
+                            item = context.Tags.OfType<DBModel.DO>().Where(n => n.Name == name).FirstOrDefault();
                     }
 
 
@@ -323,11 +320,16 @@ namespace ScadaGUI
                 if (e.EditAction == DataGridEditAction.Commit)
                 {
                     string bindingPath = e.Column.Header.ToString();
+                    string name = ((DBModel.Tag)e.EditingElement.DataContext).Name;
                     DBModel.Tag item = null;
-                    if (IO)
-                        item = (DBModel.AI)e.EditingElement.DataContext;
-                    else
-                        item = (DBModel.AO)e.EditingElement.DataContext;
+
+                    using (DBModel.IOContext context = new DBModel.IOContext())
+                    {
+                        if (IO)
+                            item = context.Tags.OfType<DBModel.AI>().Where(n => n.Name == name).FirstOrDefault();
+                        else
+                            item = context.Tags.OfType<DBModel.AO>().Where(n => n.Name == name).FirstOrDefault();
+                    }
 
                     if (bindingPath == "Connected")
                     {
