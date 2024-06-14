@@ -52,7 +52,9 @@ namespace ScadaGUI
 
         private void AlarmsMenuItem_Click(object sender, RoutedEventArgs e)
         {
-
+            AllAlarmsWindow alarms = new AllAlarmsWindow();
+            this.Hide();
+            alarms.ShowDialog();
         }
 
         private void Window_Closed(object sender, EventArgs e)

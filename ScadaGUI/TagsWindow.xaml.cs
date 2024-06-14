@@ -104,7 +104,7 @@ namespace ScadaGUI
         {
             var menuItem = (MenuItem)sender;
             var contextMenu = (ContextMenu)menuItem.Parent;
-            var item = ((DataGrid)contextMenu.PlacementTarget).SelectedItem;
+            var item = ((DataGrid)contextMenu.PlacementTarget).SelectedCells[0].Item;
 
             var response = MessageBox.Show($"Do you really want to permenantly delete {((DBModel.Tag)item).Name}?", "Question?", MessageBoxButton.YesNo);
 
@@ -412,6 +412,14 @@ namespace ScadaGUI
                 MessageBox.Show($"{ex.Message}");
             }
         
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            if (alarms != null)
+                alarms.Close();
+            Application.Current.MainWindow.Show();
+            this.Close();
         }
     }
 }

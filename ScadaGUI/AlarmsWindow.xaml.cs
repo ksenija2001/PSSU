@@ -36,7 +36,7 @@ namespace ScadaGUI
             using (DBModel.IOContext context = new DBModel.IOContext())
             {
                 var data = context.Tags.Where(n => n.Name == tagName).FirstOrDefault();
-                if (data.GetType() == typeof(DBModel.AI))
+                if (data.GetType().BaseType == typeof(DBModel.AI))
                     tagType = typeof(DBModel.AI);
                 else
                     tagType = typeof(DBModel.DI);
@@ -56,7 +56,7 @@ namespace ScadaGUI
             using (DBModel.IOContext context = new DBModel.IOContext())
             {
                 var data = context.Tags.Where(n => n.Name == tagName).FirstOrDefault();
-                if (data.GetType() == typeof(DBModel.AI))
+                if (data.GetType().BaseType == typeof(DBModel.AI))
                 {
                     alarms = ((DBModel.AI)data).Alarms;
                     active = new List<ActiveWhen>() { ActiveWhen.BELOW, ActiveWhen.ABOVE};
@@ -163,7 +163,7 @@ namespace ScadaGUI
         {
             var menuItem = (MenuItem)sender;
             var contextMenu = (ContextMenu)menuItem.Parent;
-            var item = ((DataGrid)contextMenu.PlacementTarget).SelectedItem;
+            var item = ((DataGrid)contextMenu.PlacementTarget).SelectedCells[0].Item;
 
             var response = MessageBox.Show($"Do you really want to permanantly delete this alarm?", "Question?", MessageBoxButton.YesNo);
 

@@ -49,20 +49,17 @@ namespace DataConcentrator
                 if (obj is DBModel.DI)
                 {
                     DBModel.DI item = (DBModel.DI)context.Tags.Where(n => n.Name == name).FirstOrDefault();
-                    var temp = item.Alarms;
 
                     item.Description = ((DBModel.DI)obj).Description;
                     item.ScanTime = ((DBModel.DI)obj).ScanTime;
                     item.Connected = ((DBModel.DI)obj).Connected;
                     item.ScanState = ((DBModel.DI)obj).ScanState;
                     item.IOAddress = ((DBModel.DI)obj).IOAddress;
-                    //item.Alarms = ((DBModel.DI)obj).Alarms.ToList();
 
                 }
                 else if (obj is DBModel.AI)
                 {
                     DBModel.AI item = (DBModel.AI)context.Tags.Where(n => n.Name == name).FirstOrDefault();
-                    var temp = item.Alarms;
 
                     item.Description = ((DBModel.AI)obj).Description;
                     item.ScanTime = ((DBModel.AI)obj).ScanTime;
@@ -73,7 +70,6 @@ namespace DataConcentrator
                     item.ScanState = ((DBModel.AI)obj).ScanState;
                     item.IOAddress = ((DBModel.AI)obj).IOAddress;
 
-                    //item.Alarms = ((DBModel.AI)obj).Alarms.ToList();
                 }
                 else if (obj is DBModel.DO)
                 {
