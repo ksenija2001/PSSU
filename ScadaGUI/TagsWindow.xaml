@@ -18,7 +18,7 @@
         WindowStartupLocation="CenterScreen"
         Width="1100"
         Height="900"
-        Closing="Window_Closing">
+        Closed="Window_Closed">
     
     <ScrollViewer Grid.Row="1">
         <DockPanel>
@@ -37,7 +37,7 @@
             <DataGrid Name="dataGridDITags" SelectionUnit="Cell" SelectionMode="Single" DockPanel.Dock="Top" CanUserAddRows="False" Margin="30" AutoGenerateColumns="True"  FontSize="18"  ScrollViewer.CanContentScroll="False" AutoGeneratingColumn="dataGrid_AutoGeneratingColumn" IsReadOnly="False" CellEditEnding="dataGridDITags_CellEditEnding">
    
                 <DataGrid.ContextMenu>
-                    <ContextMenu>
+                    <ContextMenu Name="DIMenu">
                         <MenuItem Header="Delete" Icon="{materialDesign:PackIcon Kind=Delete,Size=18}"   Foreground="#FFB39DDB" Click="MenuItemDelete_Click"/>
                         <MenuItem Header="Alarms" Icon="{materialDesign:PackIcon Kind=Alarm,Size=18}"   Foreground="#FFB39DDB" Click="MenuItemAlarm_Click"/>
 
@@ -45,8 +45,8 @@
                 </DataGrid.ContextMenu>
             </DataGrid>
             <DataGrid  Name="dataGridAITags" SelectionUnit="Cell" SelectionMode="Single" DockPanel.Dock="Bottom" CanUserAddRows="False" Margin="30" AutoGenerateColumns="True" FontSize="18"  ScrollViewer.CanContentScroll="False" IsReadOnly="False" AutoGeneratingColumn="dataGrid_AutoGeneratingColumn" CellEditEnding="dataGridAITags_CellEditEnding">
-                <DataGrid.ContextMenu>
-                    <ContextMenu>
+                <DataGrid.ContextMenu >
+                    <ContextMenu Name="AIMenu">
                         <MenuItem Header="Delete" Icon="{materialDesign:PackIcon Kind=Delete,Size=18}"   Foreground="#FFB39DDB" Click="MenuItemDelete_Click"/>
                         <MenuItem Header="Alarms" Icon="{materialDesign:PackIcon Kind=Alarm,Size=18}"   Foreground="#FFB39DDB" Click="MenuItemAlarm_Click"/>
 

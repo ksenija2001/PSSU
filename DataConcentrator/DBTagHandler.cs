@@ -55,6 +55,7 @@ namespace DataConcentrator
                     item.Connected = ((DBModel.DI)obj).Connected;
                     item.ScanState = ((DBModel.DI)obj).ScanState;
                     item.IOAddress = ((DBModel.DI)obj).IOAddress;
+
                 }
                 else if (obj is DBModel.AI)
                 {
@@ -68,6 +69,7 @@ namespace DataConcentrator
                     item.Connected = ((DBModel.AI)obj).Connected;
                     item.ScanState = ((DBModel.AI)obj).ScanState;
                     item.IOAddress = ((DBModel.AI)obj).IOAddress;
+
                 }
                 else if (obj is DBModel.DO)
                 {
@@ -137,10 +139,6 @@ namespace DataConcentrator
 
                     context.Tags.Remove(item);
 
-                    foreach(DBModel.Alarm alarm in ((DBModel.DI)obj).Alarms)
-                    {
-                        DBAlarmHandler.Delete(context, alarm.Id);
-                    }
                 }
                 else if (obj is DBModel.AI)
                 {
@@ -148,10 +146,6 @@ namespace DataConcentrator
 
                     context.Tags.Remove(item);
 
-                    foreach (DBModel.Alarm alarm in ((DBModel.AI)obj).Alarms)
-                    {
-                        DBAlarmHandler.Delete(context, alarm.Id);
-                    }
                 }
                 else if (obj is DBModel.DO)
                 {

@@ -9,8 +9,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using System.Collections;
 using System.Xml.Serialization;
-using static DataConcentrator.DBModel;
-using static DataConcentrator.DBAlarm.DBModel;
+using System.Data.Entity.ModelConfiguration.Conventions;
 
 namespace DataConcentrator {
 
@@ -22,8 +21,8 @@ namespace DataConcentrator {
 
     public class DBAlarm
     {
-        [XmlInclude(typeof(DBAlarm.Alarm))]
-        public class Alarm
+        [XmlInclude(typeof(DBAlarm.LogAlarm))]
+        public class LogAlarm
         {
             [Key]
             public int Id { get; set; }
@@ -36,21 +35,27 @@ namespace DataConcentrator {
 
             [ForeignKey("Tag")]
             public string TagId { get; set; }
-            public virtual Tag Tag { get; set; }
+            public virtual DBModel.Tag Tag { get; set; }
 
         }
 
         public class IOContext : DbContext
         {
-            public DbSet<Alarm> Alarms { get; set; }
+            public DbSet<LogAlarm> LogAlarms { get; set; }
 
         }
     }
 
-        public class DBModel {
+    public class DBModel 
+    {
 
         [XmlInclude(typeof(DBModel.Alarm))]
         public class Alarm {
+
+            [DatabaseGenerated(DatabaseGeneratedOption.None)]
+
+            [Key]
+            public int Id {  get; set; }
 
             [Required]
             public double Value { get; set; }
@@ -95,7 +100,7 @@ namespace DataConcentrator {
             [Range(0, 1)]
             public byte ScanState { get; set; }
 
-            public List<Alarm> Alarms { get; set; }
+            public virtual List<Alarm> Alarms { get; set; }
 
 
 
@@ -131,7 +136,7 @@ namespace DataConcentrator {
             [StringLength(5, MinimumLength = 1)]
             public string Units { get; set; }
 
-            public List<Alarm> Alarms { get; set; }
+            public virtual List<Alarm> Alarms { get; set; }
         }
 
         [XmlInclude(typeof(AO))]
@@ -157,6 +162,8 @@ namespace DataConcentrator {
 
             protected override void OnModelCreating(DbModelBuilder modelBuilder)
             {
+                modelBuilder.Conventions.Remove<StoreGeneratedIdentityKeyConvention>();
+
 
                 modelBuilder.Entity<DI>().Map(m =>
                 {
@@ -180,6 +187,12 @@ namespace DataConcentrator {
                 {
                     m.MapInheritedProperties();
                     m.ToTable("AOs");
+                });
+
+                modelBuilder.Entity<Alarm>().Map(m =>
+                {
+                    m.MapInheritedProperties();
+                    m.ToTable("Alarms");
                 });
             }
         }

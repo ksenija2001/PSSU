@@ -70,6 +70,14 @@ namespace ScadaGUI
                     dataGridDITags.ItemsSource = context.Tags.OfType<DBModel.DI>().ToList();
                     dataGridAITags.ItemsSource = context.Tags.OfType<DBModel.AI>().ToList();
                 }
+
+                var item = DIMenu.Items[1] as MenuItem;
+                item.IsEnabled = true;
+                item.Visibility = Visibility.Visible;
+
+                item = AIMenu.Items[1] as MenuItem;
+                item.IsEnabled = true;
+                item.Visibility = Visibility.Visible;
             }
             else
             {
@@ -79,6 +87,14 @@ namespace ScadaGUI
                     dataGridAITags.ItemsSource = context.Tags.OfType<DBModel.AO>().ToList();
 
                 }
+
+                var item = DIMenu.Items[1] as MenuItem;
+                item.IsEnabled = false;
+                item.Visibility = Visibility.Collapsed;
+
+                item = AIMenu.Items[1] as MenuItem;
+                item.IsEnabled = false;
+                item.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -86,7 +102,7 @@ namespace ScadaGUI
         {
             var menuItem = (MenuItem)sender;
             var contextMenu = (ContextMenu)menuItem.Parent;
-            var item = ((DataGrid)contextMenu.PlacementTarget).SelectedItem;
+            var item = ((DataGrid)contextMenu.PlacementTarget).SelectedCells[0].Item;
 
             var response = MessageBox.Show($"Do you really want to permenantly delete {((DBModel.Tag)item).Name}?", "Question?", MessageBoxButton.YesNo);
 
@@ -102,29 +118,23 @@ namespace ScadaGUI
 
         private void MenuItemAlarm_Click(object sender, RoutedEventArgs e)
         {
-            var menuItem = (MenuItem)sender;
-            var contextMenu = (ContextMenu)menuItem.Parent;
-            var data = (DataGrid)contextMenu.PlacementTarget;
-            if (data.SelectedCells.Count > 0)
+            if (IO)
             {
-                var item = data.SelectedCells[0].Item;
-                string name = ((DBModel.Tag)item).Name;
-
-                List<DBModel.Alarm> alarmList = new List<DBModel.Alarm>();
-                using (DBModel.IOContext context = new DBModel.IOContext())
+                var menuItem = (MenuItem)sender;
+                var contextMenu = (ContextMenu)menuItem.Parent;
+                var data = (DataGrid)contextMenu.PlacementTarget;
+                if (data.SelectedCells.Count > 0)
                 {
-                    var temp = context.Tags.Where(n => n.Name == name).FirstOrDefault();
-                    if (data == dataGridAITags)
-                        alarmList = ((DBModel.AI)temp).Alarms;
-                    else
-                        alarmList = ((DBModel.DI)temp).Alarms;
-                }
+                    var item = data.SelectedCells[0].Item;
+                    string tagName = ((DBModel.Tag)item).Name;
 
-                if (alarms != null)
-                    alarms.Close();
-                alarms = new AlarmsWindow(alarmList, name);
-                alarms.Show();
+                    if (alarms != null)
+                        alarms.Close();
+                    alarms = new AlarmsWindow(tagName);
+                    alarms.Show();
+                }
             }
+            
             
         }
 
@@ -218,11 +228,21 @@ namespace ScadaGUI
                 if (e.EditAction == DataGridEditAction.Commit)
                 {
                     string bindingPath = e.Column.Header.ToString();
-                    DBModel.Tag item = null;
-                    if (IO)
-                        item = (DBModel.DI)e.EditingElement.DataContext;
-                    else
-                        item = (DBModel.DO)e.EditingElement.DataContext;
+                    string name = ((DBModel.Tag)e.EditingElement.DataContext).Name;
+                    DBModel.Tag item;
+
+                    using (DBModel.IOContext context = new DBModel.IOContext())
+                    {
+                        var DItags = context.Tags.OfType<DBModel.DI>().ToList();
+                        var alarms = DItags.Select(n => n.Alarms).ToList();
+
+                        if (IO)
+                            item = (DBModel.DI)context.Tags.Where(n => n.Name == name).FirstOrDefault();
+                        else
+                            item = (DBModel.DO)context.Tags.Where(n => n.Name == name).FirstOrDefault();
+
+                    }
+
 
                     if (bindingPath == "Connected")
                     {
@@ -390,6 +410,14 @@ namespace ScadaGUI
                 MessageBox.Show($"{ex.Message}");
             }
         
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            if (alarms != null)
+                alarms.Close();
+            Application.Current.MainWindow.Show();
+            this.Close();
         }
     }
 }

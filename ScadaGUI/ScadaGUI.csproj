@@ -91,6 +91,9 @@
     <Compile Include="AlarmsWindow.xaml.cs">
       <DependentUpon>AlarmsWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="AllAlarmsWindow.xaml.cs">
+      <DependentUpon>AllAlarmsWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TagDetails.xaml.cs">
       <DependentUpon>TagDetails.xaml</DependentUpon>
     </Compile>
@@ -105,6 +108,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="AlarmsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AllAlarmsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

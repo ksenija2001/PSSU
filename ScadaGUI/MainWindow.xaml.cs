@@ -52,13 +52,19 @@ namespace ScadaGUI
 
         private void AlarmsMenuItem_Click(object sender, RoutedEventArgs e)
         {
-
+            AllAlarmsWindow alarms = new AllAlarmsWindow();
+            this.Hide();
+            alarms.ShowDialog();
         }
 
         private void Window_Closed(object sender, EventArgs e)
         {
             using (DBModel.IOContext context = new DBModel.IOContext())
-                XmlHandler.SerializeData(context, @"../../Configuration.xml");
+            {
+                using(DBAlarm.IOContext context1 = new DBAlarm.IOContext())
+                    XmlHandler.SerializeData(context1, context, @"../../Configuration.xml");
+
+            }
         }
     }
 

@@ -22,211 +22,184 @@ namespace ScadaGUI
     /// </summary>
     public partial class AlarmDetails : Window
     {
-        public AlarmDetails()
+        private Type tagType {  get; set; }
+        private string tagName { get; set; }
+
+        public AlarmDetails(Type tagType, string tagName)
         {
             InitializeComponent();
-            cmbActivate.ItemsSource = Enum.GetValues(typeof(ActiveWhen));
+            this.tagType = tagType;
+            this.tagName = tagName;
 
-            using (DBModel.IOContext context = new DBModel.IOContext())
+            if (tagType == typeof(DBModel.DI))
             {
-                List<int> ids = context.Alarms.Select(n => n.Id).ToList();
+                txtValue.IsEnabled = false;
+                cmbActivate.ItemsSource = new List<ActiveWhen>() { ActiveWhen.EQUALS };
 
-                txtId.Text = (ids.Max() + 1).ToString();
-                
             }
-            txtId.IsReadOnly = true;
+            else
+            {
+                ckbValue.IsEnabled = false;
+                cmbActivate.ItemsSource = new List<ActiveWhen>() { ActiveWhen.BELOW, ActiveWhen.ABOVE };
+
+            }
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-        //    if (ValidateInput())
-        //    {
-        //        try
-        //        {
-        //            if (rbDI.IsChecked == true)
-        //            {
-        //                DBModel.DI tag = new DBModel.DI();
-        //                tag.Name = txtName.Text.Trim();
-        //                tag.Description = txtDescription.Text.Trim();
-        //                tag.IOAddress = cmbAddress.Text.Trim();
-        //                tag.Connected = (ckbConnected.IsChecked == true) ? (byte)1 : (byte)0;
-        //                tag.ScanTime = double.Parse(txtScanTime.Text.Trim());
-        //                tag.ScanState = (ckbScanState.IsChecked == true) ? (byte)1 : (byte)0;
-        //                tag.Alarms = new List<DBModel.Alarm>();
+            if (ValidateInput())
+            {
+                try
+                {
+                    DBModel.Alarm alarm = new DBModel.Alarm();
+                    alarm.Activate = (ActiveWhen)cmbActivate.SelectedValue;
+                    alarm.Message = txtMessage.Text.Trim();
 
-        //                using (DBModel.IOContext context = new DBModel.IOContext())
-        //                {
-        //                    DBTagHandler.Create(context, tag);
-        //                }
-        //            }
-        //            else if (rbAI.IsChecked == true)
-        //            {
-        //                DBModel.AI tag = new DBModel.AI();
-        //                tag.Name = txtName.Text.Trim();
-        //                tag.Description = txtDescription.Text.Trim();
-        //                tag.IOAddress = cmbAddress.Text.Trim();
-        //                tag.Connected = (ckbConnected.IsChecked == true) ? (byte)1 : (byte)0;
-        //                tag.ScanTime = double.Parse(txtScanTime.Text.Trim());
-        //                tag.ScanState = (ckbScanState.IsChecked == true) ? (byte)1 : (byte)0;
-        //                tag.LowLimit = double.Parse(txtLow.Text.Trim());
-        //                tag.HighLimit = double.Parse(txtHigh.Text.Trim());
-        //                tag.Units = txtUnits.Text.Trim();
-        //                tag.Alarms = new List<DBModel.Alarm>();
+                    DBModel.Tag tag;
 
-        //                using (DBModel.IOContext context = new DBModel.IOContext())
-        //                {
-        //                    DBTagHandler.Create(context, tag);
-        //                }
-        //            }
-        //            else
-        //            {
-        //                MessageBox.Show("Type of input not selected");
-        //                return;
-        //            }
+                    using (DBModel.IOContext context = new DBModel.IOContext())
+                    {
+                        var DItags = context.Tags.OfType<DBModel.DI>().ToList();
+                        var AItags = context.Tags.OfType<DBModel.AI>().ToList();
+                        List<List<DBModel.Alarm>> alarms = DItags.Select(n => n.Alarms).ToList();
+                        alarms.AddRange(AItags.Select(n => n.Alarms));
+                        List<int> ids = alarms.Where(list => list.Count > 0).Select(list => list.Max(a => a.Id)).ToList();
+                        if (ids.Count == 0)
+                            alarm.Id = 1;
+                        else
+                            alarm.Id = ids.Max() + 1;
 
-        //            this.Close();
-        //        }
-        //        catch (DbEntityValidationException ex)
-        //        {
-        //            foreach (var errors in ex.EntityValidationErrors)
-        //            {
-        //                foreach (var validationError in errors.ValidationErrors)
-        //                {
-        //                    MessageBox.Show($"Wrong Format for {validationError.PropertyName}: {validationError.ErrorMessage}");
+                        if (tagType == typeof(DBModel.DI))
+                        {
+                            tag = DItags.Where(n => n.Name == tagName).FirstOrDefault();
+                            alarm.Value = (ckbValue.IsChecked == true) ? (byte)1 : (byte)0;
+                            ((DBModel.DI)tag).Alarms.Add(alarm);
+                            DBTagHandler.Update(context, (DBModel.DI)tag);
 
-        //                }
-        //            }
-        //        }
-        //        catch (FormatException ex)
-        //        {
-        //            MessageBox.Show($"{ex.Message}");
-        //        }
-        //    }
+                        }
+                        else
+                        {
+                            tag = AItags.Where(n => n.Name == tagName).FirstOrDefault();
+                            alarm.Value = double.Parse(txtValue.Text.Trim());
+                            ((DBModel.AI)tag).Alarms.Add(alarm);
+                            DBTagHandler.Update(context, (DBModel.AI)tag);
+
+                        }
+
+                    }
+
+                    this.Close();
+                }
+                catch (DbEntityValidationException ex)
+                {
+                    foreach (var errors in ex.EntityValidationErrors)
+                    {
+                        foreach (var validationError in errors.ValidationErrors)
+                        {
+                            MessageBox.Show($"Wrong Format for {validationError.PropertyName}: {validationError.ErrorMessage}");
+
+                        }
+                    }
+                }
+                catch (FormatException ex)
+                {
+                    MessageBox.Show($"{ex.Message}");
+                }
+            }
         }
 
-        //private void rbDI_Checked(object sender, RoutedEventArgs e)
-        //{
-        //    if (txtLow != null)
-        //    {
-        //        txtLow.IsEnabled = false;
-        //        txtHigh.IsEnabled = false;
-        //        txtUnits.IsEnabled = false;
-        //    }
+        private bool ValidateInput()
+        {
 
-        //}
+            bool valid = true;
 
-        //private void rbAI_Checked(object sender, RoutedEventArgs e)
-        //{
-        //    txtLow.IsEnabled = true;
-        //    txtHigh.IsEnabled = true;
-        //    txtUnits.IsEnabled = true;
-        //}
+            //checking common fields
+            if (IsEmptyField(txtMessage))
+            {
+                valid = false;
+            }
 
-        //private bool ValidateInput()
-        //{
+            if (tagType == typeof(DBModel.AI))
+            {
+                if (IsEmptyField(txtValue) | NumberCheck(txtValue))
+                    valid = false;
+            }
+            
 
-        //    bool valid = true;
+            if (cmbActivate.SelectedIndex == -1)
+            {
+                cmbActivate.Background = cmbActivate.Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#FFB39DDB");
+                cmbActivate.ToolTip = "Nothing selected!";
+                valid = false;
+            }
+            else
+            {
+                cmbActivate.ClearValue(Border.BackgroundProperty);
+            }
 
-        //    //checking common fields
-        //    if (IsEmptyField(txtName) | IsEmptyField(txtDescription)
-        //        | NumberCheck(txtScanTime))
-        //    {
-        //        valid = false;
-        //    }
+            return valid;
+        }
 
-        //    if (cmbAddress.SelectedIndex == -1)
-        //    {
-        //        cmbAddress.Background = cmbAddress.Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#FFB39DDB");
-        //        cmbAddress.ToolTip = "Nothing selected!";
-        //        valid = false;
-        //    }
-        //    else
-        //    {
-        //        cmbAddress.ClearValue(Border.BackgroundProperty);
-        //    }
+        private bool IsEmptyField(TextBox Box)
+        {
 
-        //    //checking additional fields
-        //    if (rbAI.IsChecked == true)
-        //    {
-        //        if (IsEmptyField(txtLow) | IsEmptyField(txtHigh) | IsEmptyField(txtUnits)
-        //            | NumberCheck(txtHigh) | NumberCheck(txtLow))
-        //        {
-        //            valid = false;
-        //        }
-        //    }
-        //    return valid;
-        //}
+            if (String.IsNullOrEmpty(Box.Text))
+            {
+                Box.Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#FFB39DDB");
+                Box.ToolTip = Box.Name.Replace("txt", "") + " field mustn't be empty!";
+                return true;
+            }
 
-        //private bool IsEmptyField(TextBox Box)
-        //{
+            Box.ClearValue(Border.BackgroundProperty);
+            return false;
+        }
 
-        //    if (String.IsNullOrEmpty(Box.Text))
-        //    {
-        //        Box.Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#FFB39DDB");
-        //        Box.ToolTip = Box.Name.Replace("txt", "") + " field mustn't be empty!";
-        //        return true;
-        //    }
+        private bool NumberCheck(TextBox Box)
+        {
+            double parsed_value;
 
-        //    Box.ClearValue(Border.BackgroundProperty);
-        //    return false;
-        //}
+            if (Double.TryParse(Box.Text, out parsed_value))
+            {
+                if (parsed_value <= 0)
+                {
+                    Box.Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#FFB39DDB");
+                    Box.ToolTip = Box.Name.Replace("txt", "") + " field must be greater than zero!";
+                    return true;
+                }
+            }
+            else
+            {
+                Box.Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#FFB39DDB");
+                Box.ToolTip = "Invalid input!";
+                return true;
+            }
 
-        //private bool NumberCheck(TextBox Box)
-        //{
-        //    double parsed_value;
+            Box.ClearValue(Border.BackgroundProperty);
+            return false;
 
-        //    if (Double.TryParse(Box.Text, out parsed_value))
-        //    {
-        //        if (parsed_value <= 0)
-        //        {
-        //            Box.Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#FFB39DDB");
-        //            Box.ToolTip = Box.Name.Replace("txt", "") + " field must be greater than zero!";
-        //            return true;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        Box.Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#FFB39DDB");
-        //        Box.ToolTip = "Invalid input!";
-        //        return true;
-        //    }
+        }
 
-        //    Box.ClearValue(Border.BackgroundProperty);
-        //    return false;
-
-        //}
-
-        //private void rbDI_Clicked(object sender, RoutedEventArgs e)
-        //{
-        //    BackgroundClear();
-        //}
-
-        //private void rbAI_Clicked(object sender, RoutedEventArgs e)
-        //{
-        //    BackgroundClear();
-        //}
-
-        //private void BackgroundClear()
-        //{
-        //    foreach (UIElement Control in TextBoxPanel.Children)
-        //    {
-        //        if (Control.GetType() == typeof(DockPanel))
-        //        {
-        //            foreach (UIElement DockChild in ((DockPanel)(Control)).Children)
-        //            {
-        //                DockChild.ClearValue(Border.BackgroundProperty);
-        //            }
-        //        }
-        //        Control.ClearValue(Border.BackgroundProperty);
-        //    }
-        //}
+        private void BackgroundClear()
+        {
+            foreach (UIElement Control in TextBoxPanel.Children)
+            {
+                if (Control.GetType() == typeof(DockPanel))
+                {
+                    foreach (UIElement DockChild in ((DockPanel)(Control)).Children)
+                    {
+                        DockChild.ClearValue(Border.BackgroundProperty);
+                    }
+                }
+                Control.ClearValue(Border.BackgroundProperty);
+            }
+        }
 
         private void On_KeyDown(object sender, KeyEventArgs e)
         {
-        //    if (e.Key == Key.Enter)
-        //    {
-        //        Save_Click(sender, e);
-        //    }
+            if (e.Key == Key.Enter)
+            {
+                Save_Click(sender, e);
+            }
         }
 
         private void Window_Closed(object sender, EventArgs e)

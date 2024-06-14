@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity.Validation;
 using System.Linq;
+using System.Printing;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -10,9 +11,11 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Xml.Linq;
 
 namespace ScadaGUI
 {
@@ -23,10 +26,21 @@ namespace ScadaGUI
     {
         private List<ActiveWhen> active {  get; set; }
         private List<DBModel.Alarm> alarms {  get; set; }
-        public AlarmsWindow(List<DBModel.Alarm> alarms, string tagName)
+
+        private string tagName { get; set; }
+        private Type tagType {  get; set; }
+        public AlarmsWindow(string tagName)
         {
             active = new List<ActiveWhen>() { ActiveWhen.BELOW, ActiveWhen.ABOVE, ActiveWhen.EQUALS };
-            this.alarms = alarms;
+            this.tagName = tagName;
+            using (DBModel.IOContext context = new DBModel.IOContext())
+            {
+                var data = context.Tags.Where(n => n.Name == tagName).FirstOrDefault();
+                if (data.GetType().BaseType == typeof(DBModel.AI))
+                    tagType = typeof(DBModel.AI);
+                else
+                    tagType = typeof(DBModel.DI);
+            }
 
             InitializeComponent();
 
@@ -38,6 +52,22 @@ namespace ScadaGUI
 
         private void RefreshSource()
         {
+
+            using (DBModel.IOContext context = new DBModel.IOContext())
+            {
+                var data = context.Tags.Where(n => n.Name == tagName).FirstOrDefault();
+                if (data.GetType().BaseType == typeof(DBModel.AI))
+                {
+                    alarms = ((DBModel.AI)data).Alarms;
+                    active = new List<ActiveWhen>() { ActiveWhen.BELOW, ActiveWhen.ABOVE};
+                }
+                else
+                {
+                    alarms = ((DBModel.DI)data).Alarms;
+                    active = new List<ActiveWhen>() { ActiveWhen.EQUALS };
+                }
+            }
+
             dataGridAlarms.ItemsSource = null;
             dataGridAlarms.ItemsSource = alarms;
 
@@ -73,7 +103,28 @@ namespace ScadaGUI
 
                     using (DBModel.IOContext context = new DBModel.IOContext())
                     {
-                        DBTagHandler.Update(context, item);
+
+                        if (tagType == typeof(DBModel.DI))
+                        {
+                            DBModel.DI tag = context.Tags.OfType<DBModel.DI>().Where(n => n.Name == tagName).FirstOrDefault();
+                            DBModel.Alarm alarm = tag.Alarms.Where(n => n.Id == item.Id).FirstOrDefault();
+                            alarm.Value = item.Value;
+                            alarm.Activate = item.Activate;
+                            alarm.Message = item.Message;
+                            context.SaveChanges();
+                            //DBTagHandler.Update(context, tag);
+                        }
+                        else
+                        {
+                            DBModel.AI tag = context.Tags.OfType<DBModel.AI>().Where(n => n.Name == tagName).FirstOrDefault();
+                            DBModel.Alarm alarm = tag.Alarms.Where(n => n.Id == item.Id).FirstOrDefault();
+                            alarm.Value = item.Value;
+                            alarm.Activate = item.Activate;
+                            alarm.Message = item.Message;
+                            context.SaveChanges();
+                            //DBTagHandler.Update(context, tag);
+                        }
+
                     }
 
                     dataGridAlarms.UnselectAllCells();
@@ -112,24 +163,38 @@ namespace ScadaGUI
         {
             var menuItem = (MenuItem)sender;
             var contextMenu = (ContextMenu)menuItem.Parent;
-            var item = ((DataGrid)contextMenu.PlacementTarget).SelectedItem;
+            var item = ((DataGrid)contextMenu.PlacementTarget).SelectedCells[0].Item;
 
-            var response = MessageBox.Show($"Do you really want to permenantly delete this alarm?", "Question?", MessageBoxButton.YesNo);
+            var response = MessageBox.Show($"Do you really want to permanantly delete this alarm?", "Question?", MessageBoxButton.YesNo);
 
             if (response == MessageBoxResult.Yes)
             {
                 using (DBModel.IOContext context = new DBModel.IOContext())
                 {
-                    DBAlarmHandler.Delete(context, ((DBModel.Alarm)item).Id);
-                    RefreshSource();
+                    var data = context.Tags.Where(n => n.Name == tagName).FirstOrDefault();
+                    if (data.GetType() == typeof(DBModel.AI))
+                    {
+                        DBModel.Alarm alarm = ((DBModel.AI)data).Alarms.Where(n => n.Id == ((DBModel.Alarm)item).Id).FirstOrDefault();
+                        ((DBModel.AI)data).Alarms.Remove(alarm);
+                        DBTagHandler.Update(context, (DBModel.AI)data);
+                    }
+                    else
+                    {
+                        DBModel.Alarm alarm = ((DBModel.DI)data).Alarms.Where(n => n.Id == ((DBModel.Alarm)item).Id).FirstOrDefault();
+                        ((DBModel.DI)data).Alarms.Remove(alarm);
+                        DBTagHandler.Update(context, (DBModel.DI)data);
+                    }
                 }
+
+                RefreshSource();
             }
         }
 
         private void MenuItemCreate_Click(object sender, RoutedEventArgs e)
         {
-            AlarmDetails alarm = new AlarmDetails();
+            AlarmDetails alarm = new AlarmDetails(tagType, tagName);
             alarm.ShowDialog();
+            RefreshSource();
         }
 
         private void MenuItemBack_Click(object sender, RoutedEventArgs e)
