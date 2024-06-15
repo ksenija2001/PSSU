@@ -19,10 +19,13 @@ namespace DataConcentrator {
         private static List<Thread> ActiveThreads = new List<Thread>();
         public static bool PLCStarted = false;
 
-        public static void PLCStart() {
+        public static void ConnectPLC() {
             PLCSim = new PLCSimulatorManager();
-            PLCSim.StartPLCSimulator();
             PLCData = PLCSim.GetAllData().ToDictionary(x => x.Key, x => x.Value);
+        }
+
+        public static void PLCStart() {
+            PLCSim.StartPLCSimulator();
         }
 
         public static void StartScanner(Tag tag, Type type) {
@@ -102,8 +105,10 @@ namespace DataConcentrator {
         // TODO: stopping thread entry is deleted from the base?
         public static void TerminateThread(string name) {
             Thread t = ActiveThreads.Find(x => x.Name == name);
-            t.Abort();
-            ActiveThreads.Remove(t);
+            if (t == null) {
+                t.Abort();
+                ActiveThreads.Remove(t);
+            }
         }
 
         public static void TerminateAllThreads() {
