@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Data.Entity;
 using System.Data.Entity.Validation;
 using System.Linq;
@@ -10,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
@@ -178,9 +180,9 @@ namespace ScadaGUI
                 DataGridCheckBoxColumn col = new DataGridCheckBoxColumn();
                 col.Header = e.Column.Header;
                 Binding binding = new Binding(e.PropertyName);
-                
                 col.Binding = binding;
                 col.IsReadOnly = false;
+                
                 e.Column = col;
             }
             else if (e.PropertyName == "IOAddress")
@@ -265,6 +267,17 @@ namespace ScadaGUI
                         //TODO provera da li je neki drugi signal konektovan na istu adresu ako je checked = true
                         var el = e.EditingElement as CheckBox;
                         item.Connected = (el.IsChecked == true) ? (byte)1 : (byte)0;
+                        if (item.Connected == 0)
+                        {
+                            DataGridRow row = dataGridDITags.ItemContainerGenerator.ContainerFromIndex(e.Row.GetIndex()) as DataGridRow;
+                            DataGridColumn col = dataGridDITags.Columns.Where(n => n.Header.ToString() == "ScanState").FirstOrDefault();
+                            if (col != null)
+                            {
+                                var cell = col.GetCellContent(row) as CheckBox;
+                                cell.IsChecked = false;
+                                ((DBModel.DI)item).ScanState = (byte)0;
+                            }
+                        }
                     }
                     else if (bindingPath == "ScanState") {
                         var el = e.EditingElement as CheckBox;
@@ -274,6 +287,7 @@ namespace ScadaGUI
                             MessageBox.Show("[WARNING] Tag isn't connected to any address");
                             dataGridDITags.UnselectAllCells();
                             dataGridDITags.SelectedItem = null;
+                            el.IsChecked = false;
                             return;
                         }
                         else
@@ -368,6 +382,30 @@ namespace ScadaGUI
                         //TODO provera da li je neki drugi signal konektovan na istu adresu ako je checked = true
                         var el = e.EditingElement as CheckBox;
                         item.Connected = (el.IsChecked == true) ? (byte)1 : (byte)0;
+
+                        // TODO provera da li je nesto vec konektovano na tu adresu
+                        //using (DBModel.IOContext context = new DBModel.IOContext())
+                        //{
+                        //    var adressOk = context.Tags.Where(n => n.Connected == 1 && n.IOAddress == cmbAddress.Text.Trim()).FirstOrDefault();
+                        //    if (adressOk != null)
+                        //    {
+                        //        ckbConnected.IsChecked = false;
+                        //    }
+                        //}
+
+                        //if (item.Connected == 1 && ) { }
+                        if (item.Connected == 0)
+                        {
+                            DataGridRow row = dataGridDITags.ItemContainerGenerator.ContainerFromIndex(e.Row.GetIndex()) as DataGridRow;
+                            DataGridColumn col = dataGridDITags.Columns.Where(n => n.Header.ToString() == "ScanState").FirstOrDefault();
+                            if (col != null)
+                            {
+                                var cell = col.GetCellContent(row) as CheckBox;
+                                cell.IsChecked = false;
+                                ((DBModel.AI)item).ScanState = (byte)0;
+                            }
+                        }
+
                     }
                     else if (bindingPath == "ScanState")
                     {
@@ -378,6 +416,8 @@ namespace ScadaGUI
                             MessageBox.Show("[WARNING] Tag isn't connected to any address");
                             dataGridDITags.UnselectAllCells();
                             dataGridDITags.SelectedItem = null;
+                            el.IsChecked = false;
+
                             return;
                         }
                         else

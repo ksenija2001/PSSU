@@ -196,7 +196,24 @@ namespace ScadaGUI
                     valid = false;
                 }
             }
-                return valid;
+
+            if (ckbConnected.IsChecked == true)
+            {
+                using( DBModel.IOContext context = new DBModel.IOContext())
+                {
+                    var adressOk = context.Tags.Where(n => n.Connected == 1 && n.IOAddress == cmbAddress.Text.Trim()).FirstOrDefault();
+                    if (adressOk != null)
+                    {
+                        ckbConnected.IsChecked = false;
+                    }
+                }
+            }
+
+            if (ckbScanState.IsChecked == true && ckbConnected.IsChecked == false)
+            {
+                ckbScanState.IsChecked = false;
+            }
+            return valid;
         }
 
         private bool IsEmptyField(TextBox Box) {
