@@ -19,9 +19,10 @@ namespace DataConcentrator {
         EQUALS
     }
 
-    public class DBAlarm
+    public class DBModel 
     {
-        [XmlInclude(typeof(DBAlarm.LogAlarm))]
+
+        [XmlInclude(typeof(LogAlarm))]
         public class LogAlarm
         {
             [Key]
@@ -39,17 +40,7 @@ namespace DataConcentrator {
 
         }
 
-        public class IOContext : DbContext
-        {
-            public DbSet<LogAlarm> LogAlarms { get; set; }
-
-        }
-    }
-
-    public class DBModel 
-    {
-
-        [XmlInclude(typeof(DBModel.Alarm))]
+        [XmlInclude(typeof(Alarm))]
         public class Alarm {
 
             [DatabaseGenerated(DatabaseGeneratedOption.None)]
@@ -159,6 +150,7 @@ namespace DataConcentrator {
 
         public class  IOContext : DbContext {
             public DbSet<Tag> Tags { get; set; }
+            public DbSet<LogAlarm> LogAlarms { get; set; }
 
             protected override void OnModelCreating(DbModelBuilder modelBuilder)
             {

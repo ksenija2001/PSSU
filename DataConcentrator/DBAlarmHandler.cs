@@ -11,7 +11,7 @@ namespace DataConcentrator
     public class DBAlarmHandler
     {
 
-        public static void Create(DBAlarm.IOContext context, DBAlarm.LogAlarm obj)
+        public static void Create(DBModel.IOContext context, DBModel.LogAlarm obj)
         {
             if (obj != null)
             {
@@ -45,7 +45,7 @@ namespace DataConcentrator
         //    }
         //}
 
-        public static DBAlarm.LogAlarm ReadById(DBAlarm.IOContext context, int id)
+        public static DBModel.LogAlarm ReadById(DBModel.IOContext context, int id)
         {
             return context.LogAlarms.Where(n => n.Id == id).FirstOrDefault();
         }
