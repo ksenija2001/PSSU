@@ -11,6 +11,7 @@ using System.Collections;
 using System.Xml.Serialization;
 using System.Data.Entity.ModelConfiguration.Conventions;
 
+
 namespace DataConcentrator {
 
     public enum ActiveWhen {

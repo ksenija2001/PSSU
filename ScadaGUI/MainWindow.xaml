@@ -59,6 +59,6 @@
             </ListView.View>
 
         </ListView>
-
+        <Button Name="btnStart" Content="Start PLC" Style="{DynamicResource MaterialDesignRaisedLightButton}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,-770,-30,0" Click="Start_Click"/>
     </DockPanel>
 </Window>

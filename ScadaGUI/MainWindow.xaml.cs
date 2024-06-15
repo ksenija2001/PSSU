@@ -18,6 +18,7 @@ using OxyPlot.Series;
 using DataConcentrator;
 using System.Xml.Serialization;
 using System.Data.Entity;
+using System.Data.SqlClient;
 
 
 namespace ScadaGUI
@@ -66,6 +67,37 @@ namespace ScadaGUI
                     XmlHandler.SerializeData(context1, context, @"../../Configuration.xml");
 
             }
+
+            PLCDataHandler.TerminateAllThreads();
+        }
+
+        private void Start_Click(object sender, EventArgs e) {
+            
+            PLCDataHandler.PLCStart();
+
+            List<DBModel.DI> tagsDI;
+            using (var context = new DBModel.IOContext()) {
+                tagsDI = context.Tags.OfType<DBModel.DI>().ToList();
+            }
+
+            foreach (var entry in tagsDI) {
+                if (Convert.ToBoolean(entry.ScanState) && Convert.ToBoolean(entry.Connected)) {
+                    PLCDataHandler.StartScanner(entry, entry.GetType().BaseType);
+                }
+            }
+            List<DBModel.AI> tagsAI;
+            using (var context = new DBModel.IOContext()) {
+                tagsAI = context.Tags.OfType<DBModel.AI>().ToList();
+            }
+           
+            foreach (var entry in tagsAI) {
+                if (Convert.ToBoolean(entry.ScanState) && Convert.ToBoolean(entry.Connected)) {
+                    PLCDataHandler.StartScanner(entry, entry.GetType().BaseType);
+                }
+            }
+
+            PLCDataHandler.PLCStarted = true;
+            MessageBox.Show("PLC started successfully");
         }
 
   
