@@ -30,16 +30,16 @@ namespace DataConcentrator {
 
         public static void StartScanner(Tag tag, Type type) {
 
-            
+
             if (type == typeof(DBModel.DI)) {
 
-                DBModel.DI tagDI = (DBModel.DI) tag;
+                DBModel.DI tagDI = (DBModel.DI)tag;
                 Thread t = new Thread(() => Scanning(tagDI.Name, tagDI.ScanTime, tagDI.IOAddress, type));
                 t.Name = tag.Name;
                 ActiveThreads.Add(t);
                 t.Start();
             }
-            else if(type == typeof(DBModel.AI)) {
+            else if (type == typeof(DBModel.AI)) {
 
                 DBModel.AI tagAI = (DBModel.AI)tag;
                 Thread t = new Thread(() => Scanning(tagAI.Name, tagAI.ScanTime, tagAI.IOAddress, type));
@@ -49,7 +49,6 @@ namespace DataConcentrator {
             }
         }
 
-        // TO CONSIDER: different functions for AI and DI?
         // TODO: test alarm logging
         private static void Scanning(string name, double time, string tagAddress, Type type) {
 
@@ -83,8 +82,8 @@ namespace DataConcentrator {
                         AddAlarm(name, alarms_equal);
                     }
                 }
-                
-                Thread.Sleep((int)(time*1000));
+
+                Thread.Sleep((int)(time * 1000));
             }
         }
 
@@ -118,7 +117,15 @@ namespace DataConcentrator {
             if (PLCStarted) {
                 PLCSim.Abort();
             }
-            
+
+        }
+
+        // TODO: forcing outputs when editing fields
+        public static void ForceOutput(string addr, double val) {
+            if (PLCStarted) {
+                PLCData[addr] = val;
+                PLCSim.SetValue(addr, val);
+            }
         }
     } 
 }
