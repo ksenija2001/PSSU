@@ -66,6 +66,8 @@ namespace ScadaGUI
                     XmlHandler.SerializeData(context1, context, @"../../Configuration.xml");
 
             }
+
+            PLCDataHandler.TerminateAllThreads();
         }
 
         private void Start_Click(object sender, EventArgs e) {

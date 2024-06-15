@@ -104,7 +104,12 @@ namespace DataConcentrator {
             t.Abort();
             ActiveThreads.Remove(t);
         }
-    }
 
- 
+        public static void TerminateAllThreads() {
+            foreach (var thread in ActiveThreads) {
+                thread.Abort();
+            }
+            PLCSim.Abort();
+        }
+    } 
 }
