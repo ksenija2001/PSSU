@@ -23,6 +23,8 @@ namespace ScadaGUI
     /// Interaction logic for TagDetails.xaml
     /// </summary>
     public partial class TagDetails : Window {
+
+        public event EventHandler DataChanged;
         public TagDetails() {
             InitializeComponent();
 
@@ -31,6 +33,12 @@ namespace ScadaGUI
             txtLow.IsEnabled = false;
             txtHigh.IsEnabled = false;
             txtUnits.IsEnabled = false;
+        }
+
+        protected virtual void OnDataChanged(EventArgs e)
+        {
+            EventHandler eh = DataChanged;
+            if (eh  != null) eh(this, e);
         }
 
         private void Save_Click(object sender, RoutedEventArgs e) {
@@ -50,9 +58,12 @@ namespace ScadaGUI
                             DBTagHandler.Create(context, tag);
                         }
 
+                        OnDataChanged(null);
+
                         if (Convert.ToBoolean(tag.ScanState)) {
                             PLCDataHandler.StartScanner(tag, tag.GetType());
                         }
+
                     }
                     else if (rbAI.IsChecked == true) {
                         DBModel.AI tag = new DBModel.AI();
@@ -70,16 +81,21 @@ namespace ScadaGUI
                         using (DBModel.IOContext context = new DBModel.IOContext()) {
                                 DBTagHandler.Create(context, tag);
                         }
+
+                        OnDataChanged(null);
+
                         if (Convert.ToBoolean(tag.ScanState)) {
                             PLCDataHandler.StartScanner(tag, tag.GetType());
                         }
+
                     }
                     else {
                         MessageBox.Show("Type of input not selected");
                         return;
                     }
 
-                    this.Close();
+                    ClearAllControls();
+
                 }
                 catch (DbEntityValidationException ex) {
                     foreach (var errors in ex.EntityValidationErrors) {
@@ -91,6 +107,42 @@ namespace ScadaGUI
                 }
                 catch (FormatException ex) {
                     MessageBox.Show($"{ex.Message}");
+                }
+            }
+        }
+
+        private void ClearAllControls()
+        {
+            foreach (var child in TextBoxPanel.Children)
+            {
+                switch (child)
+                {
+                    case CheckBox cb:
+                        cb.IsChecked = false;
+                        break;
+                    case ComboBox cb:
+                        cb.SelectedIndex = -1;
+                        break;
+                    case TextBox txt:
+                        txt.Text = "";
+                        break;
+                    case DockPanel dp:
+                        foreach (var c in dp.Children)
+                        {
+                            switch (c)
+                            {
+                                case CheckBox cb:
+                                    cb.IsChecked = false;
+                                    break;
+                                case ComboBox cb:
+                                    cb.SelectedIndex = -1;
+                                    break;
+                                case TextBox txt:
+                                    txt.Text = "";
+                                    break;
+                            }
+                        }
+                        break;
                 }
             }
         }

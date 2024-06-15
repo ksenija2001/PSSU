@@ -98,10 +98,10 @@ namespace ScadaGUI
                             DBTagHandler.Update(context, (DBModel.AI)tag);
                             OnDataChanged(null);
                         }
-
                     }
 
-                    //this.Close();
+
+                    ClearAllControls();
                 }
                 catch (DbEntityValidationException ex)
                 {
@@ -117,6 +117,42 @@ namespace ScadaGUI
                 catch (FormatException ex)
                 {
                     MessageBox.Show($"{ex.Message}");
+                }
+            }
+        }
+
+        private void ClearAllControls()
+        {
+            foreach (var child in TextBoxPanel.Children)
+            {
+                switch (child)
+                {
+                    case CheckBox cb:
+                        cb.IsChecked = false;
+                        break;
+                    case ComboBox cb:
+                        cb.SelectedIndex = -1;
+                        break;
+                    case TextBox txt:
+                        txt.Text = "";
+                        break;
+                    case DockPanel dp:
+                        foreach (var c in dp.Children)
+                        {
+                            switch (c)
+                            {
+                                case CheckBox cb:
+                                    cb.IsChecked = false;
+                                    break;
+                                case ComboBox cb:
+                                    cb.SelectedIndex = -1;
+                                    break;
+                                case TextBox txt:
+                                    txt.Text = "";
+                                    break;
+                            }
+                        }
+                        break;
                 }
             }
         }

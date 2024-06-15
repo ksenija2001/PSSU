@@ -21,6 +21,7 @@ namespace ScadaGUI
     /// </summary>
     public partial class TagOutputDetails : Window
     {
+        public event EventHandler DataChanged;
         public TagOutputDetails()
         {
             InitializeComponent();
@@ -32,6 +33,12 @@ namespace ScadaGUI
             txtUnits.IsEnabled = false;
 
             txtInitialValue.IsEnabled = false;
+        }
+
+        protected virtual void OnDataChanged(EventArgs e)
+        {
+            EventHandler eh = DataChanged;
+            if (eh != null) eh(this, e);
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
@@ -52,6 +59,8 @@ namespace ScadaGUI
                         {
                             DBTagHandler.Create(context, tag);
                         }
+
+                        OnDataChanged(null);
                     }
                     else if (rbAI.IsChecked == true)
                     {
@@ -70,6 +79,9 @@ namespace ScadaGUI
                         {
                             DBTagHandler.Create(context, tag);
                         }
+
+                        OnDataChanged(null);
+
                     }
                     else
                     {
@@ -77,7 +89,7 @@ namespace ScadaGUI
                         return;
                     }
 
-                    this.Close();
+                    ClearAllControls();
                 }
                 catch (DbEntityValidationException ex)
                 {
@@ -97,6 +109,41 @@ namespace ScadaGUI
             }
         }
 
+        private void ClearAllControls()
+        {
+            foreach (var child in TextBoxPanel.Children)
+            {
+                switch (child)
+                {
+                    case CheckBox cb:
+                        cb.IsChecked = false;
+                        break;
+                    case ComboBox cb:
+                        cb.SelectedIndex = -1;
+                        break;
+                    case TextBox txt:
+                        txt.Text = "";
+                        break;
+                    case DockPanel dp:
+                        foreach (var c in dp.Children)
+                        {
+                            switch (c)
+                            {
+                                case CheckBox cb:
+                                    cb.IsChecked = false;
+                                    break;
+                                case ComboBox cb:
+                                    cb.SelectedIndex = -1;
+                                    break;
+                                case TextBox txt:
+                                    txt.Text = "";
+                                    break;
+                            }
+                        }
+                        break;
+                }
+            }
+        }
         private void rbDI_Checked(object sender, RoutedEventArgs e)
         {
             if (txtLow != null)

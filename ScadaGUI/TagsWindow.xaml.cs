@@ -149,14 +149,19 @@ namespace ScadaGUI
             if (IO)
             {
                 TagDetails tag = new TagDetails();
-                tag.ShowDialog();
+                tag.DataChanged += new EventHandler(tag_DataChanged);
+                tag.Show();
             }
             else
             {
                 TagOutputDetails tag = new TagOutputDetails();
+                tag.DataChanged += new EventHandler(tag_DataChanged);
                 tag.ShowDialog();
             }
-            
+        }
+
+        void tag_DataChanged(object sender, EventArgs e)
+        {
             RefreshSources();
         }
 
@@ -263,6 +268,17 @@ namespace ScadaGUI
                     }
                     else if (bindingPath == "ScanState") {
                         var el = e.EditingElement as CheckBox;
+
+                        if (item.Connected == 0)
+                        {
+                            MessageBox.Show("[WARNING] Tag isn't connected to any address");
+                            dataGridDITags.UnselectAllCells();
+                            dataGridDITags.SelectedItem = null;
+                            return;
+                        }
+                        else
+                            ((DBModel.DI)item).ScanState = (el.IsChecked == true) ? (byte)1 : (byte)0;
+
                         ((DBModel.DI)item).ScanState = (el.IsChecked == true) ? (byte)1 : (byte)0;
 
                         if (PLCDataHandler.PLCStarted) { 
@@ -275,6 +291,7 @@ namespace ScadaGUI
                                 PLCDataHandler.StartScanner(item, typeof(DBModel.DI));
                             }
                         }
+
                     }
                     else if (bindingPath == "IOAddress")
                     {
@@ -355,6 +372,17 @@ namespace ScadaGUI
                     else if (bindingPath == "ScanState")
                     {
                         var el = e.EditingElement as CheckBox;
+
+                        if (item.Connected == 0)
+                        {
+                            MessageBox.Show("[WARNING] Tag isn't connected to any address");
+                            dataGridDITags.UnselectAllCells();
+                            dataGridDITags.SelectedItem = null;
+                            return;
+                        }
+                        else
+                            ((DBModel.AI)item).ScanState = (el.IsChecked == true) ? (byte)1 : (byte)0;
+
                         ((DBModel.AI)item).ScanState = (el.IsChecked == true) ? (byte)1 : (byte)0;
                         if (PLCDataHandler.PLCStarted) {
                             if (!Convert.ToBoolean(((DBModel.AI)item).ScanState)) {
@@ -367,6 +395,7 @@ namespace ScadaGUI
                                 PLCDataHandler.StartScanner(item, typeof(DBModel.AI));
                             }
                         }
+
                     }
                     else if (bindingPath == "IOAddress")
                     {
