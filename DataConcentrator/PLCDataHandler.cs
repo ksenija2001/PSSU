@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Media.Animation;
 using System.Xml.Linq;
 using PLCSimulator;
 using static DataConcentrator.DBModel;
@@ -26,16 +27,11 @@ namespace DataConcentrator {
 
         public static void StartScanner(Tag tag, Type type) {
 
-            List<Alarm> alarms;
-
+            
             if (type == typeof(DBModel.DI)) {
 
                 DBModel.DI tagDI = (DBModel.DI) tag;
-                using (var context = new DBModel.IOContext()) {
-                    var item = context.Tags.Where(x => x.Name == tagDI.Name).FirstOrDefault();
-                    alarms = ((DBModel.DI)item).Alarms;
-                }
-                Thread t = new Thread(() => Scanning(tagDI.Name, tagDI.ScanTime, tagDI.IOAddress, alarms, type));
+                Thread t = new Thread(() => Scanning(tagDI.Name, tagDI.ScanTime, tagDI.IOAddress, type));
                 t.Name = tag.Name;
                 ActiveThreads.Add(t);
                 t.Start();
@@ -43,25 +39,25 @@ namespace DataConcentrator {
             else if(type == typeof(DBModel.AI)) {
 
                 DBModel.AI tagAI = (DBModel.AI)tag;
-                using (var context = new DBModel.IOContext()) {
-                    var item = context.Tags.Where(x => x.Name == tagAI.Name).FirstOrDefault();
-                    alarms = ((DBModel.AI)item).Alarms;
-                }
-                Thread t = new Thread(() => Scanning(tagAI.Name, tagAI.ScanTime, tagAI.IOAddress, alarms, type));
+                Thread t = new Thread(() => Scanning(tagAI.Name, tagAI.ScanTime, tagAI.IOAddress, type));
                 t.Name = tag.Name;
                 ActiveThreads.Add(t);
                 t.Start();
             }
         }
 
-        // TODO: check whether alarms is a reference (are new alarms going to appear)?
         // TO CONSIDER: different functions for AI and DI?
         // TODO: test alarm logging
-        private static void Scanning(string name, double time, string tagAddress, List<Alarm> alarms, Type type) {
-            
+        private static void Scanning(string name, double time, string tagAddress, Type type) {
+
+            List<Alarm> alarms;
             while (true) {
                 PLCData[tagAddress] = PLCSim.GetDataForAddress(tagAddress);
                 if (type == typeof(DBModel.AI)) {
+
+                    using (var context = new DBModel.IOContext()) {
+                        alarms = context.Tags.OfType<DBModel.AI>().Where(x => x.Name == name).FirstOrDefault().Alarms;
+                    }
 
                     var alarms_above = alarms.FindAll(x => x.Activate == ActiveWhen.ABOVE).Where(x => x.Value > PLCData[tagAddress]);
                     var alarms_below = alarms.FindAll(x => x.Activate == ActiveWhen.BELOW).Where(x => x.Value < PLCData[tagAddress]);
@@ -74,6 +70,10 @@ namespace DataConcentrator {
 
                 }
                 else {
+
+                    using (var context = new DBModel.IOContext()) {
+                        alarms = context.Tags.OfType<DBModel.DI>().Where(x => x.Name == name).FirstOrDefault().Alarms;
+                    }
 
                     var alarms_equal = alarms.FindAll(x => x.Activate == ActiveWhen.BELOW).Where(x => x.Value == PLCData[tagAddress]);
                     if (alarms_equal.Any()) {
