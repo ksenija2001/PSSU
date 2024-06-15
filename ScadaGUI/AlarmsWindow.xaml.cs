@@ -166,7 +166,7 @@ namespace ScadaGUI
                 using (DBModel.IOContext context = new DBModel.IOContext())
                 {
                     var data = context.Tags.Where(n => n.Name == tagName).FirstOrDefault();
-                    if (data.GetType() == typeof(DBModel.AI))
+                    if (data.GetType().BaseType == typeof(DBModel.AI))
                     {
                         DBModel.Alarm alarm = ((DBModel.AI)data).Alarms.Where(n => n.Id == ((DBModel.Alarm)item).Id).FirstOrDefault();
                         ((DBModel.AI)data).Alarms.Remove(alarm);
