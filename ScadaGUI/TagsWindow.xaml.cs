@@ -424,11 +424,17 @@ namespace ScadaGUI
 
         private void dataGridDITags_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            dataGridDITags.UnselectAllCells();
+
+            dataGridDITags.SelectedItem = null;
             return;
         }
 
         private void dataGridAITags_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            dataGridAITags.UnselectAllCells();
+
+            dataGridAITags.SelectedItem = null;
             return;
         }
     }

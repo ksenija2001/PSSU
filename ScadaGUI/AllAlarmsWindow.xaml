@@ -15,7 +15,7 @@
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="{DynamicResource MaterialDesignFont}"  
         ScrollViewer.CanContentScroll="True" 
-        WindowStartupLocation="Manual"
+        WindowStartupLocation="CenterScreen"
         Width="900"
         Height="1100" Closed="Window_Closed">
 

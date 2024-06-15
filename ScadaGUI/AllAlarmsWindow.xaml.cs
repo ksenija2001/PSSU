@@ -26,14 +26,14 @@ namespace ScadaGUI
         public AllAlarmsWindow()
         {
             InitializeComponent();
-
+            
             using (DBModel.IOContext context = new DBModel.IOContext())
             {
 
                 // TODO get to which tag the alarm belongs to
-                var allDI = context.Tags.OfType<DBModel.DI>().ToList();
+                var allDI = context.Tags.OfType<DBModel.DI>().Where(n => n.ScanState == 1).ToList();
                 tagNames = allDI.Select(n => n.Name).ToList();
-                var allAI = context.Tags.OfType<DBModel.AI>().ToList();
+                var allAI = context.Tags.OfType<DBModel.AI>().Where(n => n.ScanState == 1).ToList();
                 tagNames.AddRange(allAI.Select(n => n.Name));
 
                 List<List<DBModel.Alarm>> alarms = allDI.Select(n => n.Alarms).ToList();
