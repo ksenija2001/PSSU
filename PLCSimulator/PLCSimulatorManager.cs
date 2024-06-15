@@ -12,8 +12,8 @@ namespace PLCSimulator
     /// 
     /// 4 x ANALOG INPUT : ADDR001 - ADDR004
     /// 4 x ANALOG OUTPUT: ADDR005 - ADDR008
-    /// 1 x DIGITAL INPUT: ADDR009
-    /// 1 x DIGITAL OUTPUT: ADDR010
+    /// 4 x DIGITAL INPUT: ADDR009 - ADDR012
+    /// 4 x DIGITAL OUTPUT: ADDR013 - ADDR016
     /// </summary>
     public class PLCSimulatorManager
     {
@@ -130,6 +130,18 @@ namespace PLCSimulator
         {
             t1.Abort();
             t2.Abort();
+        }
+
+        public Dictionary<string, double> GetAllData() {
+            lock (locker) {
+                return addressValues;
+            }
+        }
+
+        public double GetDataForAddress(string addr) {
+            lock (locker) {
+                return addressValues[addr];
+            }
         }
     }
 }

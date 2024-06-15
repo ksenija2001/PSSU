@@ -25,13 +25,7 @@ namespace ScadaGUI
         {
             InitializeComponent();
 
-            cmbAddress.ItemsSource = new List<string>
-            {
-                "ADDR001",
-                "ADDR002",
-                "ADDR003",
-                "ADDR004",
-            };
+            cmbAddress.ItemsSource = PLCDataHandler.PLCData.Keys.Skip(12).Take(4);
 
             txtLow.IsEnabled = false;
             txtHigh.IsEnabled = false;
@@ -115,6 +109,9 @@ namespace ScadaGUI
                 ckbInitialValue.IsEnabled = true;
             }
 
+            if (cmbAddress != null) {
+                cmbAddress.ItemsSource = PLCDataHandler.PLCData.Keys.Skip(12).Take(4);
+            }
         }
 
         private void rbAI_Checked(object sender, RoutedEventArgs e)
@@ -125,6 +122,8 @@ namespace ScadaGUI
 
             txtInitialValue.IsEnabled = true;
             ckbInitialValue.IsEnabled = false;
+
+            cmbAddress.ItemsSource = PLCDataHandler.PLCData.Keys.Skip(4).Take(4);
         }
 
         private bool ValidateInput()
@@ -147,6 +146,7 @@ namespace ScadaGUI
             else
             {
                 cmbAddress.ClearValue(Border.BackgroundProperty);
+                cmbAddress.ClearValue(TextBox.ToolTipProperty);
             }
 
             //checking additional fields
@@ -172,6 +172,7 @@ namespace ScadaGUI
             }
 
             Box.ClearValue(Border.BackgroundProperty);
+            Box.ClearValue(TextBox.ToolTipProperty);
             return false;
         }
 
@@ -181,7 +182,7 @@ namespace ScadaGUI
 
             if (Double.TryParse(Box.Text, out parsed_value))
             {
-                if (parsed_value <= 0)
+                if ((Box != txtLow && parsed_value == 0) || parsed_value < 0)
                 {
                     Box.Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#FFB39DDB");
                     Box.ToolTip = Box.Name.Replace("txt", "") + " field must be greater than zero!";
@@ -196,6 +197,7 @@ namespace ScadaGUI
             }
 
             Box.ClearValue(Border.BackgroundProperty);
+            Box.ClearValue(TextBox.ToolTipProperty);
             return false;
 
         }
@@ -222,6 +224,7 @@ namespace ScadaGUI
                     }
                 }
                 Control.ClearValue(Border.BackgroundProperty);
+                Control.ClearValue(TextBox.ToolTipProperty);
             }
         }
 

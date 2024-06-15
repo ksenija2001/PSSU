@@ -26,6 +26,8 @@ namespace ScadaGUI
     /// </summary>
     public partial class TagsWindow : Window
     {
+        // IO = true -> inputs
+        // IO = false -> outputs
         private bool IO {  get; set; }
 
         private AlarmsWindow alarms {  get; set; }
@@ -74,6 +76,9 @@ namespace ScadaGUI
                 var item = DIMenu.Items[1] as MenuItem;
                 item.IsEnabled = true;
                 item.Visibility = Visibility.Visible;
+
+                //var addr = dataGridDITags.Items[2] as ComboBox;
+                //addr.ItemsSource = PLCDataHandler.PLCData.Keys.Skip(8).Take(4);
 
                 item = AIMenu.Items[1] as MenuItem;
                 item.IsEnabled = true;
@@ -181,13 +186,24 @@ namespace ScadaGUI
                 Binding binding = new Binding(e.PropertyName);
                 col.SelectedItemBinding = binding;
 
-                List<string> items = new List<string>
-                {
-                    "ADDR001",
-                    "ADDR002",
-                    "ADDR003",
-                    "ADDR004"
-                };
+                List<string> items = new List<string>();
+                
+                if (IO) {
+                    if (dg == dataGridDITags) {
+                        items = PLCDataHandler.PLCData.Keys.Skip(8).Take(4).ToList();
+                    }
+                    else {
+                        items = PLCDataHandler.PLCData.Keys.Take(4).ToList();
+                    }
+                }
+                else {
+                    if (dg == dataGridDITags) {
+                        items = PLCDataHandler.PLCData.Keys.Skip(12).Take(4).ToList();
+                    }
+                    else {
+                        items = PLCDataHandler.PLCData.Keys.Skip(4).Take(4).ToList();
+                    }
+                }
 
                 col.ItemsSource = items;
                 col.IsReadOnly = false;
@@ -226,8 +242,7 @@ namespace ScadaGUI
         {
             try
             {
-                if (e.EditAction == DataGridEditAction.Commit)
-                {
+                if (e.EditAction == DataGridEditAction.Commit) {
                     string bindingPath = e.Column.Header.ToString();
                     string name = ((DBModel.Tag)e.EditingElement.DataContext).Name;
                     DBModel.Tag item;
@@ -241,16 +256,25 @@ namespace ScadaGUI
                     }
 
 
-                    if (bindingPath == "Connected")
-                    {
+                    if (bindingPath == "Connected") {
                         //TODO provera da li je neki drugi signal konektovan na istu adresu ako je checked = true
                         var el = e.EditingElement as CheckBox;
                         item.Connected = (el.IsChecked == true) ? (byte)1 : (byte)0;
                     }
-                    else if (bindingPath == "ScanState")
-                    {
+                    else if (bindingPath == "ScanState") {
                         var el = e.EditingElement as CheckBox;
                         ((DBModel.DI)item).ScanState = (el.IsChecked == true) ? (byte)1 : (byte)0;
+
+                        if (PLCDataHandler.PLCStarted) { 
+                            if (!Convert.ToBoolean(((DBModel.DI)item).ScanState)) {
+
+                                PLCDataHandler.TerminateThread(item.Name);
+
+                            } else {
+
+                                PLCDataHandler.StartScanner(item, typeof(DBModel.DI));
+                            }
+                        }
                     }
                     else if (bindingPath == "IOAddress")
                     {
@@ -332,6 +356,17 @@ namespace ScadaGUI
                     {
                         var el = e.EditingElement as CheckBox;
                         ((DBModel.AI)item).ScanState = (el.IsChecked == true) ? (byte)1 : (byte)0;
+                        if (PLCDataHandler.PLCStarted) {
+                            if (!Convert.ToBoolean(((DBModel.AI)item).ScanState)) {
+
+                                PLCDataHandler.TerminateThread(item.Name);
+
+                            }
+                            else {
+
+                                PLCDataHandler.StartScanner(item, typeof(DBModel.AI));
+                            }
+                        }
                     }
                     else if (bindingPath == "IOAddress")
                     {

@@ -26,13 +26,7 @@ namespace ScadaGUI
         public TagDetails() {
             InitializeComponent();
 
-            cmbAddress.ItemsSource = new List<string>
-            {
-                "ADDR001",
-                "ADDR002",
-                "ADDR003",
-                "ADDR004",
-            };
+            cmbAddress.ItemsSource = PLCDataHandler.PLCData.Keys.Skip(8).Take(4);
 
             txtLow.IsEnabled = false;
             txtHigh.IsEnabled = false;
@@ -55,6 +49,10 @@ namespace ScadaGUI
                         using (DBModel.IOContext context = new DBModel.IOContext()) {
                             DBTagHandler.Create(context, tag);
                         }
+
+                        if (Convert.ToBoolean(tag.ScanState)) {
+                            PLCDataHandler.StartScanner(tag, tag.GetType());
+                        }
                     }
                     else if (rbAI.IsChecked == true) {
                         DBModel.AI tag = new DBModel.AI();
@@ -71,6 +69,9 @@ namespace ScadaGUI
 
                         using (DBModel.IOContext context = new DBModel.IOContext()) {
                                 DBTagHandler.Create(context, tag);
+                        }
+                        if (Convert.ToBoolean(tag.ScanState)) {
+                            PLCDataHandler.StartScanner(tag, tag.GetType());
                         }
                     }
                     else {
@@ -101,12 +102,19 @@ namespace ScadaGUI
                 txtUnits.IsEnabled = false;
             }
 
+            if (cmbAddress != null) {
+                cmbAddress.ItemsSource = PLCDataHandler.PLCData.Keys.Skip(8).Take(4);
+            }
+
         }
 
         private void rbAI_Checked(object sender, RoutedEventArgs e) {
+            
             txtLow.IsEnabled = true;
             txtHigh.IsEnabled = true;
             txtUnits.IsEnabled = true;
+
+            cmbAddress.ItemsSource = PLCDataHandler.PLCData.Keys.Take(4);
         }
 
         private bool ValidateInput() {
@@ -157,6 +165,7 @@ namespace ScadaGUI
 
             if (Double.TryParse(Box.Text, out parsed_value)) {
                 if ((Box != txtLow && parsed_value == 0) || parsed_value < 0 ) {
+
                     Box.Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#FFB39DDB");
                     Box.ToolTip = Box.Name.Replace("txt", "") + " field must be positive!";
                     return true;
