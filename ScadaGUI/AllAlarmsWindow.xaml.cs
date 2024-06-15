@@ -21,7 +21,8 @@ namespace ScadaGUI
     /// Interaction logic for AllAlarmsWindow.xaml
     /// </summary>
     public partial class AllAlarmsWindow : Window
-    {
+    { 
+        public List<string> tagNames {  get; set; }
         public AllAlarmsWindow()
         {
             InitializeComponent();
@@ -31,17 +32,25 @@ namespace ScadaGUI
 
                 // TODO get to which tag the alarm belongs to
                 var allDI = context.Tags.OfType<DBModel.DI>().ToList();
+                tagNames = allDI.Select(n => n.Name).ToList();
                 var allAI = context.Tags.OfType<DBModel.AI>().ToList();
+                tagNames.AddRange(allAI.Select(n => n.Name));
 
                 List<List<DBModel.Alarm>> alarms = allDI.Select(n => n.Alarms).ToList();
                 alarms.AddRange(allAI.Select(n => n.Alarms));
 
                 List<DBModel.Alarm> a = alarms.Where(list => list.Count > 0).SelectMany(list => list).ToList();
 
-                dataGridAlarms.ItemsSource = a;
-
-                List<int> ids = a.Select(n => n.Id).ToList();
-
+                int i = 0;
+                dataGridAlarms.ItemsSource = a.Select(n => new
+                {
+                    Id = n.Id,
+                    Value = n.Value,
+                    Message = n.Message,
+                    Activate = n.Activate,
+                    TagName = tagNames[i++]
+                });
+                
             };
         }
 
