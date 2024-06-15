@@ -16,10 +16,9 @@
         FontFamily="{DynamicResource MaterialDesignFont}"  
         ScrollViewer.CanContentScroll="True" 
         WindowStartupLocation="CenterScreen"
-        Width="1000"
-        Height="800"
-        Activated="Window_Activated" 
-        Closing="Window_Closing">
+        Width="1100"
+        Height="900"
+        Closed="Window_Closed">
     
     <ScrollViewer Grid.Row="1">
         <DockPanel>
@@ -29,34 +28,28 @@
                         <DockPanel HorizontalAlignment="Stretch"/>
                     </ItemsPanelTemplate>
                 </Menu.ItemsPanel>
-                <MenuItem Margin="20,0,-30,0" Icon="{materialDesign:PackIcon Kind=Input, Size=18}" ToolTip="View input tags" Foreground="#FFB39DDB" Click="MenuItemViewInputs_Click"/>
-                <MenuItem Margin="20,0,-30,0" Icon="{materialDesign:PackIcon Kind=Output, Size=18}" ToolTip="View output tags" Foreground="#FFB39DDB" Click="MenuItemViewOutputs_Click"/>
+                <MenuItem Margin="20,0,-30,0" Width="50"  Icon="{materialDesign:PackIcon Kind=Add, Size=18}" ToolTip="Add tag" Foreground="#FFB39DDB" Click="MenuItemCreate_Click"/>
+                <MenuItem Margin="20,0,-30,0" Width="50" Icon="{materialDesign:PackIcon Kind=Input, Size=18}" ToolTip="View input tags" Foreground="#FFB39DDB" Click="MenuItemViewInputs_Click"/>
+                <MenuItem Margin="20,0,-30,0" Width="50" Icon="{materialDesign:PackIcon Kind=Output, Size=18}" ToolTip="View output tags" Foreground="#FFB39DDB" Click="MenuItemViewOutputs_Click"/>
+                <MenuItem Margin="50,0,-30,0" Width="50" Icon="{materialDesign:PackIcon Kind=Undo, Size=18}" ToolTip="View output tags" Foreground="#FFB39DDB" Click="MenuItemBack_Click" HorizontalAlignment="Left"/>
+
             </Menu>
-            <DataGrid Name="dataGridDigitalTags" DockPanel.Dock="Left" Margin="30" AutoGenerateColumns="True" FontSize="18"  ScrollViewer.CanContentScroll="False" IsReadOnly="True" RowEditEnding="dataGridTags_RowEditEnding" SelectionChanged="dataGridTags_SelectionChanged">
-                <DataGrid.Columns>
-                    <materialDesign:DataGridTextColumn Header="Name" Binding="{Binding Name}" />
-                    <materialDesign:DataGridTextColumn Header="Description" Binding="{Binding Description}" />
-                    <materialDesign:DataGridComboBoxColumn Header="I/O" SelectedValueBinding="{Binding Adress, Mode=TwoWay}" />
-                    <materialDesign:DataGridTextColumn Header="Last scan" Binding="{Binding ScanTime}" />
-                    <materialDesign:DataGridComboBoxColumn Header="Scan" SelectedValueBinding="{Binding Scan, Mode=TwoWay}" />
-                </DataGrid.Columns>
+            <DataGrid Name="dataGridDITags" SelectionUnit="Cell" SelectionMode="Single" DockPanel.Dock="Top" CanUserAddRows="False" Margin="30" AutoGenerateColumns="True"  FontSize="18"  ScrollViewer.CanContentScroll="False" AutoGeneratingColumn="dataGrid_AutoGeneratingColumn" IsReadOnly="False" CellEditEnding="dataGridDITags_CellEditEnding" MouseDoubleClick="dataGridDITags_MouseDoubleClick">
+   
                 <DataGrid.ContextMenu>
-                    <ContextMenu>
+                    <ContextMenu Name="DIMenu">
                         <MenuItem Header="Delete" Icon="{materialDesign:PackIcon Kind=Delete,Size=18}"   Foreground="#FFB39DDB" Click="MenuItemDelete_Click"/>
+                        <MenuItem Header="Alarms" Icon="{materialDesign:PackIcon Kind=Alarm,Size=18}"   Foreground="#FFB39DDB" Click="MenuItemAlarm_Click"/>
+
                     </ContextMenu>
                 </DataGrid.ContextMenu>
             </DataGrid>
-            <DataGrid Name="dataGridAnalogTags" DockPanel.Dock="Right" Margin="30" AutoGenerateColumns="True" FontSize="18"  ScrollViewer.CanContentScroll="False" IsReadOnly="True" RowEditEnding="dataGridTags_RowEditEnding" SelectionChanged="dataGridTags_SelectionChanged">
-                <!--<DataGrid.Columns>
-                    <materialDesign:DataGridTextColumn Header="Name" Binding="{Binding Name}" />
-                    <materialDesign:DataGridTextColumn Header="Description" Binding="{Binding Description}" />
-                    <materialDesign:DataGridComboBoxColumn Header="I/O" SelectedValueBinding="{Binding Adress, Mode=TwoWay}" />
-                    <materialDesign:DataGridTextColumn Header="Last scan" Binding="{Binding ScanTime}" />
-                    <materialDesign:DataGridComboBoxColumn Header="Scan" SelectedValueBinding="{Binding Scan, Mode=TwoWay}" />
-                </DataGrid.Columns>-->
-                <DataGrid.ContextMenu>
-                    <ContextMenu>
+            <DataGrid  Name="dataGridAITags" SelectionUnit="Cell" SelectionMode="Single" DockPanel.Dock="Bottom" CanUserAddRows="False" Margin="30" AutoGenerateColumns="True" FontSize="18"  ScrollViewer.CanContentScroll="False" IsReadOnly="False" AutoGeneratingColumn="dataGrid_AutoGeneratingColumn" CellEditEnding="dataGridAITags_CellEditEnding" MouseDoubleClick="dataGridAITags_MouseDoubleClick">
+                <DataGrid.ContextMenu >
+                    <ContextMenu Name="AIMenu">
                         <MenuItem Header="Delete" Icon="{materialDesign:PackIcon Kind=Delete,Size=18}"   Foreground="#FFB39DDB" Click="MenuItemDelete_Click"/>
+                        <MenuItem Header="Alarms" Icon="{materialDesign:PackIcon Kind=Alarm,Size=18}"   Foreground="#FFB39DDB" Click="MenuItemAlarm_Click"/>
+
                     </ContextMenu>
                 </DataGrid.ContextMenu>
             </DataGrid>

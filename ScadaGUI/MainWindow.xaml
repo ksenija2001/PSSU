@@ -17,9 +17,9 @@
         FontFamily="{DynamicResource MaterialDesignFont}"  
         ScrollViewer.CanContentScroll="True" 
         WindowStartupLocation="CenterScreen"
-        Width="1000"
+        Width="1200"
         Height="800"
-        Activated="Window_Activated">
+        Activated="Window_Activated" Closed="Window_Closed">
 
     <Window.DataContext>
         <local:MainViewModel/>
@@ -34,14 +34,31 @@
             </Menu.ItemsPanel>
              <MenuItem Margin="20,0,-30,0" Icon="{materialDesign:PackIcon Kind=Database,Size=18}" ToolTip="View tags" Foreground="#FFB39DDB" Click="TagsMenuItem_Click" />
             <MenuItem Margin="20,0,-30,0" Icon="{materialDesign:PackIcon Kind=Alarm,Size=18}" ToolTip="View alarms" Foreground="#FFB39DDB" Click="AlarmsMenuItem_Click"/>
+            <Button Name="btnStart" Content="Start PLC" Style="{DynamicResource MaterialDesignRaisedLightButton}" HorizontalAlignment="Right" Margin="0,0, -500,0" Click="Start_Click"/>
         </Menu>
         <Grid DockPanel.Dock="Left" Width="700">
             <ComboBox Name="tagComboBox" Panel.ZIndex="10" Width="150" BorderThickness="0.5" Margin="0, 30, 30, 0" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Column="1"/>
             <oxy:PlotView Model="{Binding MyModel}" Panel.ZIndex="0" Height="700" Margin="10,0,10,0" Grid.ColumnSpan="2" />
         </Grid>
-        <ListView Name="alarmListView" DockPanel.Dock="Right" >
-            <ListViewItem/>
-        </ListView>
+        <ListView Name="alarmListView" DockPanel.Dock="Right">
+            <ListViewItem>Hello</ListViewItem>
 
+            <Style TargetType="ListViewItem" BasedOn="{StaticResource MaterialDesignListBoxItem}">
+                <Setter Property="Background" Value="Green" />
+            </Style>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="IsEnabled" Value="False"/>
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="" DisplayMemberBinding="{Binding AlarmTime, StringFormat={}{0:M d hh:mm:ss tt}}"/>
+                    <GridViewColumn Header=""  DisplayMemberBinding="{Binding Tag}"/>
+                    <GridViewColumn Header=""  DisplayMemberBinding="{Binding Message}"/>
+                </GridView>
+            </ListView.View>
+
+        </ListView>
     </DockPanel>
 </Window>

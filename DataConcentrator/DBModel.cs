@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 using System.Data.Entity;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.Collections;
+using System.Xml.Serialization;
+using System.Data.Entity.ModelConfiguration.Conventions;
+
 
 namespace DataConcentrator {
 
@@ -16,38 +20,50 @@ namespace DataConcentrator {
         EQUALS
     }
 
-    public enum ScanState {
-        ON,
-        OFF
-    }
+    public class DBModel 
+    {
 
-    public class DBModel {
-
-        public class Alarm {
-
+        [XmlInclude(typeof(LogAlarm))]
+        public class LogAlarm
+        {
             [Key]
             public int Id { get; set; }
+
+            [Required]
+            public DateTime AlarmTime { get; set; }
+
+            [Required]
+            public string Message { get; set; }
+
+            [ForeignKey("Tag")]
+            public string TagId { get; set; }
+            public virtual DBModel.Tag Tag { get; set; }
+
+        }
+
+        [XmlInclude(typeof(Alarm))]
+        public class Alarm {
+
+            [DatabaseGenerated(DatabaseGeneratedOption.None)]
+
+            [Key]
+            public int Id {  get; set; }
 
             [Required]
             public double Value { get; set; }
 
             [Required]
             [EnumDataType(typeof(ActiveWhen))]
-            private ActiveWhen Activate { get; set; }
+            public ActiveWhen Activate { get; set; }
 
             [Required]
-            public DateTime AlarmTime { get; set; }
-
-            [Required]
-            private string Message { get; set; }
-
-            [ForeignKey("Tag")]
-            public int TagId { get; set; }
-            public virtual Tag Tag { get; set; }
-
+            public string Message { get; set; }
         }
 
-        public class Tag {
+        public abstract class Tag
+        {
+
+            [DatabaseGenerated(DatabaseGeneratedOption.None)]
 
             [Key]
             public string Name { get; set; }
@@ -61,28 +77,37 @@ namespace DataConcentrator {
 
             [Required]
             [Range(0, 1)]
-            public sbyte Connected { get; set; }
+            public byte Connected { get; set; }
 
         }
 
+        [XmlInclude(typeof(DI))]
         public class DI : Tag {
+
 
             [Required]
             public double ScanTime { get; set; }
 
             [Required]
-            [EnumDataType(typeof(ScanState))]
-            public ScanState ScanState { get; set; }
+            [Range(0, 1)]
+            public byte ScanState { get; set; }
 
             public virtual List<Alarm> Alarms { get; set; }
+
+
+
         }
+
+        [XmlInclude(typeof(DO))]
 
         public class DO : Tag {
 
             [Required]
             [Range(0, 1)]
-            public sbyte InitialValue { get; set; }
+            public byte InitialValue { get; set; }
         }
+
+        [XmlInclude(typeof(AI))]
 
         public class AI : Tag {
 
@@ -90,7 +115,8 @@ namespace DataConcentrator {
             public double ScanTime { get; set; }
 
             [Required]
-            public ScanState ScanState { get; set; }
+            [Range(0, 1)]
+            public byte ScanState { get; set; }
 
             [Required]
             public double LowLimit { get; set; }
@@ -105,10 +131,12 @@ namespace DataConcentrator {
             public virtual List<Alarm> Alarms { get; set; }
         }
 
+        [XmlInclude(typeof(AO))]
+
         public class AO : Tag {
 
             [Required]
-            public bool InitialValue { get; set; }
+            public double InitialValue { get; set; }
 
             [Required]
             public double LowLimit { get; set; }
@@ -121,12 +149,47 @@ namespace DataConcentrator {
             public string Units { get; set; }
         }
 
-        public class  InputsOuputsContext : DbContext {
-            public DbSet<Alarm> Alarms { get; set; }
-            public DbSet<DI> DIs { get; set; }
-            public DbSet<DO> DOs { get; set; }
-            public DbSet<AI> AIs { get; set; }
-            public DbSet<AO> AOs { get; set; }
+        public class  IOContext : DbContext {
+            public DbSet<Tag> Tags { get; set; }
+            public DbSet<LogAlarm> LogAlarms { get; set; }
+
+            protected override void OnModelCreating(DbModelBuilder modelBuilder)
+            {
+                modelBuilder.Conventions.Remove<StoreGeneratedIdentityKeyConvention>();
+
+
+                modelBuilder.Entity<DI>().Map(m =>
+                {
+                    m.MapInheritedProperties();
+                    m.ToTable("DIs");
+                });
+
+                modelBuilder.Entity<AI>().Map(m =>
+                {
+                    m.MapInheritedProperties();
+                    m.ToTable("AIs");
+                });
+
+                modelBuilder.Entity<DO>().Map(m =>
+                {
+                    m.MapInheritedProperties();
+                    m.ToTable("DOs");
+                });
+
+                modelBuilder.Entity<AO>().Map(m =>
+                {
+                    m.MapInheritedProperties();
+                    m.ToTable("AOs");
+                });
+
+                modelBuilder.Entity<Alarm>().Map(m =>
+                {
+                    m.MapInheritedProperties();
+                    m.ToTable("Alarms");
+                });
+            }
         }
+
     }
 }
+
