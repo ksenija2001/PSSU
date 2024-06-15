@@ -110,7 +110,10 @@ namespace DataConcentrator {
             foreach (var thread in ActiveThreads) {
                 thread.Abort();
             }
-            PLCSim.Abort();
+            if (PLCStarted) {
+                PLCSim.Abort();
+            }
+            
         }
     } 
 }
