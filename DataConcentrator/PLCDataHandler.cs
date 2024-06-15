@@ -86,9 +86,10 @@ namespace DataConcentrator {
         }
 
         public static void AddAlarm(string name, IEnumerable<DBModel.Alarm> filtered_alarms) {
-            using (var context = new DBAlarm.IOContext()) {
+            using (var context = new DBModel.IOContext()) {
                 foreach (var a in filtered_alarms) {
-                    DBAlarm.LogAlarm alarm = new DBAlarm.LogAlarm();
+                    LogAlarm alarm = new LogAlarm();
+                    alarm.Id = context.LogAlarms.Max(x => x.Id) + 1;
                     alarm.AlarmTime = DateTime.Now;
                     alarm.Message = a.Message;
                     alarm.TagId = name;

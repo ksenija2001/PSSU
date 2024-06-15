@@ -77,6 +77,9 @@ namespace ScadaGUI
                 item.IsEnabled = true;
                 item.Visibility = Visibility.Visible;
 
+                //var addr = dataGridDITags.Items[2] as ComboBox;
+                //addr.ItemsSource = PLCDataHandler.PLCData.Keys.Skip(8).Take(4);
+
                 item = AIMenu.Items[1] as MenuItem;
                 item.IsEnabled = true;
                 item.Visibility = Visibility.Visible;
@@ -183,13 +186,24 @@ namespace ScadaGUI
                 Binding binding = new Binding(e.PropertyName);
                 col.SelectedItemBinding = binding;
 
-                List<string> items = new List<string>
-                {
-                    "ADDR001",
-                    "ADDR002",
-                    "ADDR003",
-                    "ADDR004"
-                };
+                List<string> items = new List<string>();
+                
+                if (IO) {
+                    if (dg == dataGridDITags) {
+                        items = PLCDataHandler.PLCData.Keys.Skip(8).Take(4).ToList();
+                    }
+                    else {
+                        items = PLCDataHandler.PLCData.Keys.Take(4).ToList();
+                    }
+                }
+                else {
+                    if (dg == dataGridDITags) {
+                        items = PLCDataHandler.PLCData.Keys.Skip(12).Take(4).ToList();
+                    }
+                    else {
+                        items = PLCDataHandler.PLCData.Keys.Skip(4).Take(4).ToList();
+                    }
+                }
 
                 col.ItemsSource = items;
                 col.IsReadOnly = false;

@@ -109,10 +109,12 @@ namespace ScadaGUI
         }
 
         private void rbAI_Checked(object sender, RoutedEventArgs e) {
-            cmbAddress.ItemsSource = PLCDataHandler.PLCData.Keys.Take(4);
+            
             txtLow.IsEnabled = true;
             txtHigh.IsEnabled = true;
             txtUnits.IsEnabled = true;
+
+            cmbAddress.ItemsSource = PLCDataHandler.PLCData.Keys.Take(4);
         }
 
         private bool ValidateInput() {
@@ -163,6 +165,7 @@ namespace ScadaGUI
 
             if (Double.TryParse(Box.Text, out parsed_value)) {
                 if ((Box != txtLow && parsed_value == 0) || parsed_value < 0 ) {
+
                     Box.Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#FFB39DDB");
                     Box.ToolTip = Box.Name.Replace("txt", "") + " field must be positive!";
                     return true;
