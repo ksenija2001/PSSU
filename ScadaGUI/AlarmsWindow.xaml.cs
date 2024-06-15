@@ -1,4 +1,5 @@
 ﻿using DataConcentrator;
+using MaterialDesignThemes.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity.Validation;
@@ -26,7 +27,6 @@ namespace ScadaGUI
     {
         private List<ActiveWhen> active {  get; set; }
         private List<DBModel.Alarm> alarms {  get; set; }
-
         private string tagName { get; set; }
         private Type tagType {  get; set; }
         public AlarmsWindow(string tagName)
@@ -47,7 +47,6 @@ namespace ScadaGUI
             lblTitle.Content = "Alarms for tag " + tagName;
 
             RefreshSource();
-            
         }
 
         private void RefreshSource()
@@ -71,7 +70,7 @@ namespace ScadaGUI
             dataGridAlarms.ItemsSource = null;
             dataGridAlarms.ItemsSource = alarms;
 
-            ((DataGridComboBoxColumn)dataGridAlarms.Columns[2]).ItemsSource = active;
+            ((System.Windows.Controls.DataGridComboBoxColumn)dataGridAlarms.Columns[2]).ItemsSource = active;
         }
 
         private void dataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
@@ -99,31 +98,26 @@ namespace ScadaGUI
                         var el = e.EditingElement as TextBox;
                         item.Message = el.Text.Trim();
                     }
-                   
 
+                    DBModel.Alarm alarm;
                     using (DBModel.IOContext context = new DBModel.IOContext())
                     {
 
                         if (tagType == typeof(DBModel.DI))
                         {
                             DBModel.DI tag = context.Tags.OfType<DBModel.DI>().Where(n => n.Name == tagName).FirstOrDefault();
-                            DBModel.Alarm alarm = tag.Alarms.Where(n => n.Id == item.Id).FirstOrDefault();
-                            alarm.Value = item.Value;
-                            alarm.Activate = item.Activate;
-                            alarm.Message = item.Message;
-                            context.SaveChanges();
-                            //DBTagHandler.Update(context, tag);
+                            alarm = tag.Alarms.Where(n => n.Id == item.Id).FirstOrDefault();
                         }
                         else
                         {
                             DBModel.AI tag = context.Tags.OfType<DBModel.AI>().Where(n => n.Name == tagName).FirstOrDefault();
-                            DBModel.Alarm alarm = tag.Alarms.Where(n => n.Id == item.Id).FirstOrDefault();
-                            alarm.Value = item.Value;
-                            alarm.Activate = item.Activate;
-                            alarm.Message = item.Message;
-                            context.SaveChanges();
-                            //DBTagHandler.Update(context, tag);
+                            alarm = tag.Alarms.Where(n => n.Id == item.Id).FirstOrDefault();
                         }
+
+                        alarm.Value = item.Value;
+                        alarm.Activate = item.Activate;
+                        alarm.Message = item.Message;
+                        context.SaveChanges();
 
                     }
 
@@ -192,9 +186,18 @@ namespace ScadaGUI
 
         private void MenuItemCreate_Click(object sender, RoutedEventArgs e)
         {
-            AlarmDetails alarm = new AlarmDetails(tagType, tagName);
-            alarm.ShowDialog();
-            RefreshSource();
+            AlarmDetails alarm = new AlarmDetails(tagName, tagType);
+            alarm.DataChanged += new EventHandler(alarm_DataChanged);
+            alarm.Show();
+        }
+
+        void alarm_DataChanged(object sender, EventArgs e)
+        {
+            AlarmDetails child = sender as AlarmDetails;
+            if (child != null)
+            {
+                RefreshSource();
+            }
         }
 
         private void MenuItemBack_Click(object sender, RoutedEventArgs e)

@@ -32,9 +32,10 @@ namespace ScadaGUI
         {
             InitializeComponent();
 
-            using(DBModel.IOContext context = new DBModel.IOContext())
+            using (DBModel.IOContext context = new DBModel.IOContext())
             {
-                context.Configuration.ProxyCreationEnabled = false;
+                alarmListView.Items.Clear();
+                alarmListView.ItemsSource = context.LogAlarms.ToList();
             }
 
         }
@@ -62,7 +63,7 @@ namespace ScadaGUI
         {
             using (DBModel.IOContext context = new DBModel.IOContext())
             {
-                using(DBAlarm.IOContext context1 = new DBAlarm.IOContext())
+                using(DBModel.IOContext context1 = new DBModel.IOContext())
                     XmlHandler.SerializeData(context1, context, @"../../Configuration.xml");
 
             }
@@ -98,6 +99,8 @@ namespace ScadaGUI
             PLCDataHandler.PLCStarted = true;
             MessageBox.Show("PLC started successfully");
         }
+
+  
     }
 
 

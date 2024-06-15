@@ -170,6 +170,7 @@ namespace ScadaGUI
                 DataGridCheckBoxColumn col = new DataGridCheckBoxColumn();
                 col.Header = e.Column.Header;
                 Binding binding = new Binding(e.PropertyName);
+                
                 col.Binding = binding;
                 col.IsReadOnly = false;
                 e.Column = col;
@@ -440,6 +441,22 @@ namespace ScadaGUI
                 alarms.Close();
             Application.Current.MainWindow.Show();
             this.Close();
+        }
+
+        private void dataGridDITags_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            dataGridDITags.UnselectAllCells();
+
+            dataGridDITags.SelectedItem = null;
+            return;
+        }
+
+        private void dataGridAITags_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            dataGridAITags.UnselectAllCells();
+
+            dataGridAITags.SelectedItem = null;
+            return;
         }
     }
 }
