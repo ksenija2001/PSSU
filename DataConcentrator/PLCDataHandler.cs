@@ -105,8 +105,10 @@ namespace DataConcentrator {
         // TODO: stopping thread entry is deleted from the base?
         public static void TerminateThread(string name) {
             Thread t = ActiveThreads.Find(x => x.Name == name);
-            t.Abort();
-            ActiveThreads.Remove(t);
+            if (t == null) {
+                t.Abort();
+                ActiveThreads.Remove(t);
+            }
         }
 
         public static void TerminateAllThreads() {
