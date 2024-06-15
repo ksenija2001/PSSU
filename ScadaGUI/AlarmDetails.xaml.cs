@@ -20,16 +20,20 @@ namespace ScadaGUI
     /// <summary>
     /// Interaction logic for AlarmDetails.xaml
     /// </summary>
+    /// 
     public partial class AlarmDetails : Window
     {
         private Type tagType {  get; set; }
         private string tagName { get; set; }
 
-        public AlarmDetails(Type tagType, string tagName)
+        public event EventHandler DataChanged;
+
+        public AlarmDetails(string tagName, Type tagType)
         {
-            InitializeComponent();
             this.tagType = tagType;
             this.tagName = tagName;
+
+            InitializeComponent();
 
             if (tagType == typeof(DBModel.DI))
             {
@@ -42,6 +46,15 @@ namespace ScadaGUI
                 ckbValue.IsEnabled = false;
                 cmbActivate.ItemsSource = new List<ActiveWhen>() { ActiveWhen.BELOW, ActiveWhen.ABOVE };
 
+            }
+        }
+
+        protected virtual void OnDataChanged(EventArgs e)
+        {
+            EventHandler eh = DataChanged;
+            if (eh != null)
+            {
+                eh(this, e);
             }
         }
 
@@ -75,7 +88,7 @@ namespace ScadaGUI
                             alarm.Value = (ckbValue.IsChecked == true) ? (byte)1 : (byte)0;
                             ((DBModel.DI)tag).Alarms.Add(alarm);
                             DBTagHandler.Update(context, (DBModel.DI)tag);
-
+                            OnDataChanged(null);
                         }
                         else
                         {
@@ -83,12 +96,12 @@ namespace ScadaGUI
                             alarm.Value = double.Parse(txtValue.Text.Trim());
                             ((DBModel.AI)tag).Alarms.Add(alarm);
                             DBTagHandler.Update(context, (DBModel.AI)tag);
-
+                            OnDataChanged(null);
                         }
 
                     }
 
-                    this.Close();
+                    //this.Close();
                 }
                 catch (DbEntityValidationException ex)
                 {

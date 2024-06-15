@@ -15,7 +15,7 @@
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="{DynamicResource MaterialDesignFont}"  
         ScrollViewer.CanContentScroll="True" 
-        WindowStartupLocation="Manual"
+        WindowStartupLocation="CenterScreen"
         Width="900"
         Height="1100" Closed="Window_Closed">
 
@@ -38,11 +38,6 @@
                     <DataGridTextColumn Header="Message" Binding="{Binding Message}" />
                     <DataGridTextColumn Header="Tag Name" Binding="{Binding TagName}" />
                 </DataGrid.Columns>
-                <DataGrid.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Header="Delete" Icon="{materialDesign:PackIcon Kind=Delete,Size=18}"   Foreground="#FFB39DDB" Click="MenuItemDelete_Click"/>
-                    </ContextMenu>
-                </DataGrid.ContextMenu>
             </DataGrid>
         </DockPanel>
     </ScrollViewer>

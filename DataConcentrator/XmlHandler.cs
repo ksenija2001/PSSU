@@ -26,7 +26,7 @@ namespace DataConcentrator
             Path = path;
         }
 
-        public static void SerializeData(DBAlarm.IOContext contextAlarm, DBModel.IOContext context, string path)
+        public static void SerializeData(DBModel.IOContext contextAlarm, DBModel.IOContext context, string path)
         {
             var tags = context.Tags.ToList();
             List<DBModel.Tag> items = new List<DBModel.Tag>();
@@ -87,11 +87,11 @@ namespace DataConcentrator
             }
            
             var alarms = contextAlarm.LogAlarms.ToList();
-            List<DBAlarm.LogAlarm> newAlarm = new List<DBAlarm.LogAlarm>();
+            List<DBModel.LogAlarm> newAlarm = new List<DBModel.LogAlarm>();
 
             foreach (var al in alarms)
             {
-                DBAlarm.LogAlarm a = new DBAlarm.LogAlarm();
+                DBModel.LogAlarm a = new DBModel.LogAlarm();
                 a.AlarmTime = al.AlarmTime;
                 a.Id = al.Id;
                 a.TagId = al.TagId;
@@ -108,7 +108,7 @@ namespace DataConcentrator
                     typeof(DBModel.AO),
                     typeof(DBModel.DO),
                     typeof(DBModel.Alarm),
-                    typeof(DBAlarm.LogAlarm),
+                    typeof(DBModel.LogAlarm),
                 };
 
                 writer.WriteStartElement("Configuration");
