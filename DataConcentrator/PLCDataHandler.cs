@@ -26,11 +26,16 @@ namespace DataConcentrator {
 
         public static void StartScanner(Tag tag, Type type) {
 
+            List<Alarm> alarms;
 
             if (type == typeof(DBModel.DI)) {
 
                 DBModel.DI tagDI = (DBModel.DI) tag;
-                Thread t = new Thread(() => Scanning(tagDI.Name, tagDI.ScanTime, tagDI.IOAddress, tagDI.Alarms, type));
+                using (var context = new DBModel.IOContext()) {
+                    var item = context.Tags.Where(x => x.Name == tagDI.Name).FirstOrDefault();
+                    alarms = ((DBModel.DI)item).Alarms;
+                }
+                Thread t = new Thread(() => Scanning(tagDI.Name, tagDI.ScanTime, tagDI.IOAddress, alarms, type));
                 t.Name = tag.Name;
                 ActiveThreads.Add(t);
                 t.Start();
@@ -38,7 +43,11 @@ namespace DataConcentrator {
             else if(type == typeof(DBModel.AI)) {
 
                 DBModel.AI tagAI = (DBModel.AI)tag;
-                Thread t = new Thread(() => Scanning(tagAI.Name, tagAI.ScanTime, tagAI.IOAddress, tagAI.Alarms, type));
+                using (var context = new DBModel.IOContext()) {
+                    var item = context.Tags.Where(x => x.Name == tagAI.Name).FirstOrDefault();
+                    alarms = ((DBModel.AI)item).Alarms;
+                }
+                Thread t = new Thread(() => Scanning(tagAI.Name, tagAI.ScanTime, tagAI.IOAddress, alarms, type));
                 t.Name = tag.Name;
                 ActiveThreads.Add(t);
                 t.Start();

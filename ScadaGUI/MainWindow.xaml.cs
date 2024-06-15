@@ -72,30 +72,27 @@ namespace ScadaGUI
             
             PLCDataHandler.PLCStart();
 
+            List<DBModel.DI> tagsDI;
             using (var context = new DBModel.IOContext()) {
-                var tagsDI = context.Tags.OfType<DBModel.DI>().ToList();
-                foreach (var entry in tagsDI) {
-                    if (Convert.ToBoolean(entry.ScanState) && Convert.ToBoolean(entry.Connected)) {
-                        //DBModel.DI tag = new DBModel.DI();
-                        //tag.Name = entry.Name;
-                        //tag.ScanTime = entry.ScanTime;
-                        //tag.IOAddress = entry.IOAddress;
-                        //tag.Alarms = new List<DBModel.Alarm>();
-                        PLCDataHandler.StartScanner(entry, entry.GetType());
-                    }
-                }
-                var tagsAI = context.Tags.OfType<DBModel.AI>().ToList();
-                foreach (var entry in tagsAI) {
-                    if (Convert.ToBoolean(entry.ScanState) && Convert.ToBoolean(entry.Connected)) {
-                        //DBModel.AI tag = new DBModel.AI();
-                        //tag.Name = entry.Name;
-                        //tag.ScanTime = entry.ScanTime;
-                        //tag.IOAddress = entry.IOAddress;
-                        //tag.Alarms = new List<DBModel.Alarm>();
-                        PLCDataHandler.StartScanner(entry, entry.GetType());
-                    }
+                tagsDI = context.Tags.OfType<DBModel.DI>().ToList();
+            }
+
+            foreach (var entry in tagsDI) {
+                if (Convert.ToBoolean(entry.ScanState) && Convert.ToBoolean(entry.Connected)) {
+                    PLCDataHandler.StartScanner(entry, entry.GetType().BaseType);
                 }
             }
+            List<DBModel.AI> tagsAI;
+            using (var context = new DBModel.IOContext()) {
+                tagsAI = context.Tags.OfType<DBModel.AI>().ToList();
+            }
+           
+            foreach (var entry in tagsAI) {
+                if (Convert.ToBoolean(entry.ScanState) && Convert.ToBoolean(entry.Connected)) {
+                    PLCDataHandler.StartScanner(entry, entry.GetType().BaseType);
+                }
+            }
+
             PLCDataHandler.PLCStarted = true;
             MessageBox.Show("PLC started successfully");
         }
