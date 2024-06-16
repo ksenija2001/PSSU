@@ -32,6 +32,7 @@ namespace ScadaGUI
         // IO = true -> inputs
         // IO = false -> outputs
         private bool IO {  get; set; }
+        public event EventHandler InputListChanged;
 
         private AlarmsWindow alarms {  get; set; }
         public TagsWindow()
@@ -41,6 +42,11 @@ namespace ScadaGUI
             InitializeComponent();
             RefreshSources();
           
+        }
+
+        protected virtual void OnInputListChanged(EventArgs e) {
+            EventHandler eh = InputListChanged;
+            if (eh != null) eh(this, e);
         }
 
         private void MenuItemViewInputs_Click(object sender, RoutedEventArgs e)
@@ -130,6 +136,7 @@ namespace ScadaGUI
                 }
 
                 RefreshSources();
+                OnInputListChanged(null);
                 PLCDataHandler.TerminateThread(((DBModel.Tag)item).Name);
             }
         }
@@ -173,6 +180,7 @@ namespace ScadaGUI
         void tag_DataChanged(object sender, EventArgs e)
         {
             RefreshSources();
+            OnInputListChanged(null);
         }
 
         private void dataGrid_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)

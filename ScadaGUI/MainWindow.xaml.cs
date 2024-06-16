@@ -30,46 +30,41 @@ namespace ScadaGUI
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
-    {
+    public partial class MainWindow : Window {
         GraphViewModel graph = new GraphViewModel();
 
-        public MainWindow()
-        {
+        public MainWindow() {
             InitializeComponent();
 
-            using (DBModel.IOContext context = new DBModel.IOContext())
-            {
+            using (DBModel.IOContext context = new DBModel.IOContext()) {
                 alarmListView.Items.Clear();
                 alarmListView.ItemsSource = context.LogAlarms.ToList();
-                tagComboBox.ItemsSource = context.Tags.Select(x => x.Name).ToList();
+                var cmb_list = context.Tags.OfType<DBModel.DI>().Select(x => x.Name).ToList();
+                cmb_list.AddRange(context.Tags.OfType<DBModel.AI>().Select(x => x.Name).ToList());
+                tagComboBox.ItemsSource = cmb_list;
             }
         }
 
-        private void Window_Activated(object sender, EventArgs e)
-        {
-           
+        private void Window_Activated(object sender, EventArgs e) {
+
         }
 
-        private void TagsMenuItem_Click(object sender, RoutedEventArgs e)
-        {
+        private void TagsMenuItem_Click(object sender, RoutedEventArgs e) {
             TagsWindow tags = new TagsWindow();
+            tags.InputListChanged += new EventHandler(OnComboBoxDataChanged);
             this.Hide();
             tags.ShowDialog();
         }
 
-        private void AlarmsMenuItem_Click(object sender, RoutedEventArgs e)
-        {
+        private void AlarmsMenuItem_Click(object sender, RoutedEventArgs e) {
             AllAlarmsWindow alarms = new AllAlarmsWindow();
             this.Hide();
             alarms.ShowDialog();
         }
 
-        private void Window_Closed(object sender, EventArgs e)
-        {
-            using (DBModel.IOContext context = new DBModel.IOContext())
-            {
-                using(DBModel.IOContext context1 = new DBModel.IOContext())
+        private void Window_Closed(object sender, EventArgs e) {
+            using (DBModel.IOContext context = new DBModel.IOContext()) {
+                using (DBModel.IOContext context1 = new DBModel.IOContext())
                     XmlHandler.SerializeData(context1, context, @"../../Configuration.xml");
 
             }
@@ -78,8 +73,6 @@ namespace ScadaGUI
         }
 
         private void Start_Click(object sender, EventArgs e) {
-            
-            PLCDataHandler.PLCStart();
 
             List<DBModel.DI> tagsDI;
             using (var context = new DBModel.IOContext()) {
@@ -96,7 +89,7 @@ namespace ScadaGUI
                 tagsAI = context.Tags.OfType<DBModel.AI>().ToList();
                 tagComboBox.ItemsSource = context.Tags.Select(x => x.Name).ToList();
             }
-           
+
             foreach (var entry in tagsAI) {
                 if (Convert.ToBoolean(entry.ScanState) && Convert.ToBoolean(entry.Connected)) {
                     PLCDataHandler.StartScanner(entry, entry.GetType().BaseType);
@@ -105,7 +98,7 @@ namespace ScadaGUI
 
             PLCDataHandler.PLCStarted = true;
             MessageBox.Show("PLC started successfully");
-            
+
         }
 
         private void OnDataChanged(object sender, EventArgs e) {
@@ -116,6 +109,15 @@ namespace ScadaGUI
                 GraphCtl.InvalidatePlot(true);
             }
         }
+
+        private void OnComboBoxDataChanged(object sender, EventArgs e) {
+            using (DBModel.IOContext context = new DBModel.IOContext()) {
+                var cmb_list = context.Tags.OfType<DBModel.DI>().Select(x => x.Name).ToList();
+                cmb_list.AddRange(context.Tags.OfType<DBModel.AI>().Select(x => x.Name).ToList());
+                tagComboBox.ItemsSource = cmb_list;
+            }
+        }
+        
     }
 
     public class GraphViewModel {
