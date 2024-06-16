@@ -67,35 +67,36 @@ namespace ScadaGUI
                     DBModel.Alarm alarm = new DBModel.Alarm();
                     alarm.Activate = (ActiveWhen)cmbActivate.SelectedValue;
                     alarm.Message = txtMessage.Text.Trim();
+                    alarm.TagId = tagName;
 
                     DBModel.Tag tag;
 
                     using (DBModel.IOContext context = new DBModel.IOContext())
                     {
-                        var DItags = context.Tags.OfType<DBModel.DI>().ToList();
-                        var AItags = context.Tags.OfType<DBModel.AI>().ToList();
-                        List<List<DBModel.Alarm>> alarms = DItags.Select(n => n.Alarms).ToList();
-                        alarms.AddRange(AItags.Select(n => n.Alarms));
-                        List<int> ids = alarms.Where(list => list.Count > 0).Select(list => list.Max(a => a.Id)).ToList();
-                        if (ids.Count == 0)
-                            alarm.Id = 1;
+                        List<DBModel.Alarm> alarms = context.Set<DBModel.Alarm>().ToList();
+                        if (alarms.Count > 0)
+                            alarm.Id = alarms.Max(n => n.Id) + 1;
                         else
-                            alarm.Id = ids.Max() + 1;
+                            alarm.Id = 1;
 
                         if (tagType == typeof(DBModel.DI))
                         {
-                            tag = DItags.Where(n => n.Name == tagName).FirstOrDefault();
+                            tag = DBTagHandler.FindTag<DBModel.DI>(context, tagName); 
                             alarm.Value = (ckbValue.IsChecked == true) ? (byte)1 : (byte)0;
-                            ((DBModel.DI)tag).Alarms.Add(alarm);
-                            DBTagHandler.Update(context, (DBModel.DI)tag);
+                            DBTagAlarmHandler.Create(context, alarm);
+                            List<DBModel.Alarm> al = ((DBModel.DI)tag).Alarms;
+                            al.Add(alarm);
+                            DBTagHandler.UpdateTag(context, tagName, "Alarms", al, (DBModel.DI)tag);
                             OnDataChanged(null);
                         }
                         else
                         {
-                            tag = AItags.Where(n => n.Name == tagName).FirstOrDefault();
+                            tag = DBTagHandler.FindTag<DBModel.AI>(context, tagName); 
                             alarm.Value = double.Parse(txtValue.Text.Trim());
-                            ((DBModel.AI)tag).Alarms.Add(alarm);
-                            DBTagHandler.Update(context, (DBModel.AI)tag);
+                            DBTagAlarmHandler.Create(context, alarm);
+                            List<DBModel.Alarm> al = ((DBModel.AI)tag).Alarms;
+                            al.Add(alarm);
+                            DBTagHandler.UpdateTag(context, tagName, "Alarms", al, (DBModel.AI)tag);
                             OnDataChanged(null);
                         }
                     }

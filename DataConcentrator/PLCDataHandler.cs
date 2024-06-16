@@ -91,7 +91,11 @@ namespace DataConcentrator {
             using (var context = new DBModel.IOContext()) {
                 foreach (var a in filtered_alarms) {
                     LogAlarm alarm = new LogAlarm();
-                    alarm.Id = context.LogAlarms.Max(x => x.Id) + 1;
+                    if (context.LogAlarms.ToList().Count > 0)
+                        alarm.Id = context.LogAlarms.Max(x => x.Id) + 1;
+                    else
+                        alarm.Id = 1;
+
                     alarm.AlarmTime = DateTime.Now;
                     alarm.Message = a.Message;
                     alarm.TagId = name;
@@ -104,7 +108,7 @@ namespace DataConcentrator {
         // TODO: stopping thread entry is deleted from the base?
         public static void TerminateThread(string name) {
             Thread t = ActiveThreads.Find(x => x.Name == name);
-            if (t == null) {
+            if (t != null) {
                 t.Abort();
                 ActiveThreads.Remove(t);
             }

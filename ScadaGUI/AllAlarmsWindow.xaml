@@ -34,9 +34,9 @@
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="ID" Binding="{Binding Id}" />
                     <DataGridTextColumn Header="Value" Binding="{Binding Value}" />
-                    <DataGridTextColumn Header="Activate" Binding="{Binding Activate}" />
+                    <DataGridTextColumn Header="Last alarms" Binding="{Binding AlarmTime}" />
                     <DataGridTextColumn Header="Message" Binding="{Binding Message}" />
-                    <DataGridTextColumn Header="Tag Name" Binding="{Binding TagName}" />
+                    <DataGridTextColumn Header="Tag Name" Binding="{Binding TagId}" />
                 </DataGrid.Columns>
             </DataGrid>
         </DockPanel>

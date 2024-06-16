@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Data.Entity;
 using System.Data.Entity.Validation;
 using System.Linq;
+using System.Runtime.Remoting.Contexts;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -10,6 +12,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
@@ -107,7 +110,8 @@ namespace ScadaGUI
         {
             var menuItem = (MenuItem)sender;
             var contextMenu = (ContextMenu)menuItem.Parent;
-            var item = ((DataGrid)contextMenu.PlacementTarget).SelectedCells[0].Item;
+            DataGrid dg = (DataGrid)contextMenu.PlacementTarget;
+            var item = dg.SelectedCells[0].Item;
 
             var response = MessageBox.Show($"Do you really want to permenantly delete {((DBModel.Tag)item).Name}?", "Question?", MessageBoxButton.YesNo);
 
@@ -115,9 +119,17 @@ namespace ScadaGUI
             {
                 using (DBModel.IOContext context = new DBModel.IOContext())
                 {
-                    DBTagHandler.Delete(context, item);
-                    RefreshSources();
+                    if (IO && dg == dataGridDITags)
+                        DBTagHandler.DeleteTag(context, ((DBModel.Tag)item).Name, (DBModel.DI)item);
+                    else if (IO && dg == dataGridAITags)
+                        DBTagHandler.DeleteTag(context, ((DBModel.Tag)item).Name, (DBModel.AI)item);
+                    else if (!IO && dg == dataGridDITags)
+                        DBTagHandler.DeleteTag(context, ((DBModel.Tag)item).Name, (DBModel.DO)item);
+                    else if (!IO && dg == dataGridAITags)
+                        DBTagHandler.DeleteTag(context, ((DBModel.Tag)item).Name, (DBModel.AO)item);
                 }
+
+                RefreshSources();
             }
         }
 
@@ -138,12 +150,9 @@ namespace ScadaGUI
                     alarms = new AlarmsWindow(tagName);
                     alarms.Show();
                 }
-            }
-            
-            
+            }   
         }
 
-      
         private void MenuItemCreate_Click(object sender, RoutedEventArgs e)
         {
             if (IO)
@@ -178,9 +187,9 @@ namespace ScadaGUI
                 DataGridCheckBoxColumn col = new DataGridCheckBoxColumn();
                 col.Header = e.Column.Header;
                 Binding binding = new Binding(e.PropertyName);
-                
                 col.Binding = binding;
                 col.IsReadOnly = false;
+                
                 e.Column = col;
             }
             else if (e.PropertyName == "IOAddress")
@@ -243,221 +252,140 @@ namespace ScadaGUI
             this.Close();
         }
 
-        private void dataGridDITags_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        private void dataGridTags_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
             try
             {
-                if (e.EditAction == DataGridEditAction.Commit) {
+                if (e.EditAction == DataGridEditAction.Commit) 
+                {
+                    DataGrid dg = (DataGrid)sender;
                     string bindingPath = e.Column.Header.ToString();
                     string name = ((DBModel.Tag)e.EditingElement.DataContext).Name;
-                    DBModel.Tag item;
-
-                    using (DBModel.IOContext context = new DBModel.IOContext())
-                    {
-                        if (IO)
-                            item = context.Tags.OfType<DBModel.DI>().Where(n => n.Name == name).FirstOrDefault();
-                        else
-                            item = context.Tags.OfType<DBModel.DO>().Where(n => n.Name == name).FirstOrDefault();
-                    }
-
-
-                    if (bindingPath == "Connected") {
-                        //TODO provera da li je neki drugi signal konektovan na istu adresu ako je checked = true
-                        var el = e.EditingElement as CheckBox;
-                        item.Connected = (el.IsChecked == true) ? (byte)1 : (byte)0;
-                    }
-                    else if (bindingPath == "ScanState") {
-                        var el = e.EditingElement as CheckBox;
-
-                        if (item.Connected == 0)
-                        {
-                            MessageBox.Show("[WARNING] Tag isn't connected to any address");
-                            dataGridDITags.UnselectAllCells();
-                            dataGridDITags.SelectedItem = null;
-                            return;
-                        }
-                        else
-                            ((DBModel.DI)item).ScanState = (el.IsChecked == true) ? (byte)1 : (byte)0;
-
-                        ((DBModel.DI)item).ScanState = (el.IsChecked == true) ? (byte)1 : (byte)0;
-
-                        if (PLCDataHandler.PLCStarted) { 
-                            if (!Convert.ToBoolean(((DBModel.DI)item).ScanState)) {
-
-                                PLCDataHandler.TerminateThread(item.Name);
-
-                            } else {
-
-                                PLCDataHandler.StartScanner(item, typeof(DBModel.DI));
-                            }
-                        }
-
-                    }
-                    else if (bindingPath == "IOAddress")
-                    {
-                        var el = e.EditingElement as ComboBox;
-                        item.IOAddress = el.Text;
-                    }
-                    else if (bindingPath == "ScanTime")
-                    {
-                        var el = e.EditingElement as TextBox;
-                        // TODO napraviti proveru da li moze da se parsira
-                        ((DBModel.DI)item).ScanTime = double.Parse(el.Text.Trim());
-                    }
-                    else if (bindingPath == "InitialValue")
-                    {
-                        var el = e.EditingElement as CheckBox;
-                        ((DBModel.DO)item).InitialValue = (el.IsChecked == true) ? (byte)1 : (byte)0;
-                    }
-                    else if (bindingPath == "Description")
-                    {
-                        var el = e.EditingElement as TextBox;
-                        item.Description = el.Text.Trim();
-                    }
-
-                    using (DBModel.IOContext context = new DBModel.IOContext())
-                    {
-                        DBTagHandler.Update(context, item);
-                    }
-
-                    dataGridDITags.UnselectAllCells();
-
-                    dataGridDITags.SelectedItem = null;
-
-                }
-            }
-            catch (DbEntityValidationException ex)
-            {
-                foreach (var errors in ex.EntityValidationErrors)
-                {
-                    foreach (var validationError in errors.ValidationErrors)
-                    {
-                        MessageBox.Show($"Wrong Format for {validationError.PropertyName}: {validationError.ErrorMessage}");
-
-                    }
-                }
-            }
-            catch (FormatException ex)
-            {
-                MessageBox.Show($"{ex.Message}");
-            }
-        }
-            
-        
-
-        private void dataGridAITags_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
-        {
-            try
-            {
-                if (e.EditAction == DataGridEditAction.Commit)
-                {
-                    string bindingPath = e.Column.Header.ToString();
-                    string name = ((DBModel.Tag)e.EditingElement.DataContext).Name;
+                    object value = null;
                     DBModel.Tag item = null;
 
                     using (DBModel.IOContext context = new DBModel.IOContext())
                     {
-                        if (IO)
-                            item = context.Tags.OfType<DBModel.AI>().Where(n => n.Name == name).FirstOrDefault();
-                        else
-                            item = context.Tags.OfType<DBModel.AO>().Where(n => n.Name == name).FirstOrDefault();
+                        if (IO && dg == dataGridDITags)
+                            item = DBTagHandler.FindTag<DBModel.DI>(context, name);
+                        else if (IO && dg == dataGridAITags)
+                            item = DBTagHandler.FindTag<DBModel.AI>(context, name);
+                        else if(!IO && dg == dataGridDITags)
+                            item = DBTagHandler.FindTag<DBModel.DO>(context, name);
+                        else if(!IO && dg == dataGridAITags)
+                            item = DBTagHandler.FindTag<DBModel.AO>(context, name);
                     }
 
                     if (bindingPath == "Connected")
                     {
-                        //TODO provera da li je neki drugi signal konektovan na istu adresu ako je checked = true
                         var el = e.EditingElement as CheckBox;
-                        item.Connected = (el.IsChecked == true) ? (byte)1 : (byte)0;
+                        value = (el.IsChecked == true) ? (byte)1 : (byte)0;
+
+                        using (DBModel.IOContext context = new DBModel.IOContext())
+                        {
+                            var tag = context.Tags.Where(n => n.Connected == 1 && n.IOAddress == item.IOAddress && n.Name != name).FirstOrDefault();
+                            if (tag != default(DBModel.Tag))
+                            {
+                                MessageBox.Show("[WARNING] IOAdress already in use by other tag");
+                                dg.UnselectAllCells();
+                                dg.SelectedItem = null;
+                                el.IsChecked = false;
+                                return;
+                            }
+                        }
+
+                        if ((byte)value == 0)
+                        {
+                            DataGridRow row = dg.ItemContainerGenerator.ContainerFromIndex(e.Row.GetIndex()) as DataGridRow;
+                            DataGridColumn col = dg.Columns.Where(n => n.Header.ToString() == "ScanState").FirstOrDefault();
+                            var scanState = col.GetCellContent(row) as CheckBox;
+                            scanState.IsChecked = false;
+
+                            using (DBModel.IOContext context = new DBModel.IOContext())
+                            {
+                                if (IO && dg == dataGridDITags)
+                                    DBTagHandler.UpdateTag(context, name, "ScanState", value, (DBModel.DI)item);
+                                else if (IO && dg == dataGridAITags)
+                                    DBTagHandler.UpdateTag(context, name, "ScanState", value, (DBModel.AI)item);
+                                else if (!IO && dg == dataGridDITags)
+                                    DBTagHandler.UpdateTag(context, name, "ScanState", value, (DBModel.DO)item);
+                                else if (!IO && dg == dataGridAITags)
+                                    DBTagHandler.UpdateTag(context, name, "ScanState", value, (DBModel.AO)item);
+                            }
+                        }
                     }
                     else if (bindingPath == "ScanState")
                     {
                         var el = e.EditingElement as CheckBox;
+                        value = (el.IsChecked == true) ? (byte)1 : (byte)0;
 
                         if (item.Connected == 0)
                         {
                             MessageBox.Show("[WARNING] Tag isn't connected to any address");
-                            dataGridDITags.UnselectAllCells();
-                            dataGridDITags.SelectedItem = null;
+                            dg.UnselectAllCells();
+                            dg.SelectedItem = null;
+                            el.IsChecked = false;
                             return;
                         }
-                        else
-                            ((DBModel.AI)item).ScanState = (el.IsChecked == true) ? (byte)1 : (byte)0;
 
-                        ((DBModel.AI)item).ScanState = (el.IsChecked == true) ? (byte)1 : (byte)0;
-                        if (PLCDataHandler.PLCStarted) {
-                            if (!Convert.ToBoolean(((DBModel.AI)item).ScanState)) {
-
+                        if (PLCDataHandler.PLCStarted && IO)
+                        {
+                            if ((byte)value == (byte)0)
                                 PLCDataHandler.TerminateThread(item.Name);
-
-                            }
-                            else {
-
-                                PLCDataHandler.StartScanner(item, typeof(DBModel.AI));
-                            }
+                            else
+                                PLCDataHandler.StartScanner(item, item.GetType().BaseType);
                         }
-
                     }
                     else if (bindingPath == "IOAddress")
                     {
                         var el = e.EditingElement as ComboBox;
-                        item.IOAddress = el.Text;
-                    }
-                    else if (bindingPath == "ScanTime")
-                    {
-                        var el = e.EditingElement as TextBox;
-                        // TODO napraviti proveru da li moze da se parsira
-                        ((DBModel.AI)item).ScanTime = double.Parse(el.Text.Trim());
-                    }
-                    else if (bindingPath == "InitialValue")
-                    {
-                        var el = e.EditingElement as TextBox;
-                        // TODO napraviti proveru da li moze da se parsira
-                        ((DBModel.AO)item).InitialValue = double.Parse(el.Text.Trim());
-                    }
-                    else if (bindingPath == "Description")
-                    {
-                        var el = e.EditingElement as TextBox;
-                        item.Description = el.Text.Trim();
-                    }
-                    else if (bindingPath == "Units")
-                    {
-                        var el = e.EditingElement as TextBox;
-                        if (IO)
-                            ((DBModel.AI)item).Units = el.Text.Trim();
-                        else
-                            ((DBModel.AO)item).Units = el.Text.Trim();
+                        value = el.Text;
 
+                        if (item.Connected == (byte)1)
+                        {
+                            using (DBModel.IOContext context = new DBModel.IOContext())
+                            {
+                                var tag = context.Tags.Where(n => n.Connected == 1 && n.IOAddress == el.Text && n.Name != name).FirstOrDefault();
+                                if (tag != default(DBModel.Tag))
+                                {
+                                    DataGridRow row = dg.ItemContainerGenerator.ContainerFromIndex(e.Row.GetIndex()) as DataGridRow;
+                                    DataGridColumn col = dg.Columns.Where(n => n.Header.ToString() == "Connected").FirstOrDefault();
+                                    var cell = col.GetCellContent(row) as CheckBox;
+                                    cell.IsChecked = false;
+                                    DBTagHandler.UpdateTag(context, name, "Connected", (byte)0, item);
+
+                                    MessageBox.Show("[WARNING] IOAdress already in use by other tag");
+                                }
+                            }
+                        }
                     }
-                    else if (bindingPath == "LowLimit")
+                    else if (bindingPath == "ScanTime" || bindingPath == "InitialValue" ||
+                            bindingPath == "LowLimit" || bindingPath == "HighLimit")
                     {
                         var el = e.EditingElement as TextBox;
-                        // TODO napraviti proveru da li moze da se parsira
-                        if (IO)
-                            ((DBModel.AI)item).LowLimit = double.Parse(el.Text.Trim());
-                        else
-                            ((DBModel.AO)item).LowLimit = double.Parse(el.Text.Trim());
-
+                        value = double.Parse(el.Text.Trim());
                     }
-                    else if (bindingPath == "HighLimit")
+                    else if (bindingPath == "Description" || bindingPath == "Units")
                     {
                         var el = e.EditingElement as TextBox;
-                        // TODO napraviti proveru da li moze da se parsira
-                        if (IO)
-                            ((DBModel.AI)item).HighLimit = double.Parse(el.Text.Trim());
-                        else
-                            ((DBModel.AO)item).HighLimit = double.Parse(el.Text.Trim());
-
+                        value = el.Text.Trim();
                     }
 
                     using (DBModel.IOContext context = new DBModel.IOContext())
                     {
-                        DBTagHandler.Update(context, item);
+                        if (IO && dg == dataGridDITags)
+                            DBTagHandler.UpdateTag(context, name, bindingPath, value, (DBModel.DI)item);
+                        else if (IO && dg == dataGridAITags)
+                            DBTagHandler.UpdateTag(context, name, bindingPath, value, (DBModel.AI)item);
+                        else if (!IO && dg == dataGridDITags)
+                            DBTagHandler.UpdateTag(context, name, bindingPath, value, (DBModel.DO)item);
+                        else if (!IO && dg == dataGridAITags)
+                            DBTagHandler.UpdateTag(context, name, bindingPath, value, (DBModel.AO)item);
                     }
 
-                    dataGridAITags.UnselectAllCells();
-
-                    dataGridAITags.SelectedItem = null;
-
+                    dg.UnselectAllCells();
+                    dg.SelectedItem = null;
+                    dg.SelectedIndex = -1;
                 }
             }
             catch (DbEntityValidationException ex)
@@ -465,17 +393,13 @@ namespace ScadaGUI
                 foreach (var errors in ex.EntityValidationErrors)
                 {
                     foreach (var validationError in errors.ValidationErrors)
-                    {
                         MessageBox.Show($"Wrong Format for {validationError.PropertyName}: {validationError.ErrorMessage}");
-
-                    }
                 }
             }
             catch (FormatException ex)
             {
                 MessageBox.Show($"{ex.Message}");
             }
-        
         }
 
         private void Window_Closed(object sender, EventArgs e)
@@ -486,19 +410,12 @@ namespace ScadaGUI
             this.Close();
         }
 
-        private void dataGridDITags_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void dataGridTags_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            dataGridDITags.UnselectAllCells();
-
-            dataGridDITags.SelectedItem = null;
-            return;
-        }
-
-        private void dataGridAITags_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            dataGridAITags.UnselectAllCells();
-
-            dataGridAITags.SelectedItem = null;
+            DataGrid dg = (DataGrid)sender;
+            dg.CancelEdit();
+            dg.UnselectAllCells();
+            dg.SelectedItem = null;
             return;
         }
     }
