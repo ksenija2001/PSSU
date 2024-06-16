@@ -2,12 +2,32 @@
 <Configuration>
   <ArrayOfTag>
     <Tag p3:type="AI" xmlns:p3="http://www.w3.org/2001/XMLSchema-instance">
+      <Name>Cos</Name>
+      <Description>cos</Description>
+      <IOAddress>ADDR003</IOAddress>
+      <Connected>1</Connected>
+      <ScanTime>1</ScanTime>
+      <ScanState>1</ScanState>
+      <LowLimit>0</LowLimit>
+      <HighLimit>5</HighLimit>
+      <Units>m</Units>
+      <Alarms>
+        <Alarm>
+          <Id>3</Id>
+          <Value>5</Value>
+          <Activate>BELOW</Activate>
+          <Message>Cos below 5</Message>
+          <TagId>Cos</TagId>
+        </Alarm>
+      </Alarms>
+    </Tag>
+    <Tag p3:type="AI" xmlns:p3="http://www.w3.org/2001/XMLSchema-instance">
       <Name>nestoAI</Name>
       <Description>nesto</Description>
       <IOAddress>ADDR001</IOAddress>
       <Connected>1</Connected>
-      <ScanTime>1</ScanTime>
-      <ScanState>1</ScanState>
+      <ScanTime>0.1</ScanTime>
+      <ScanState>0</ScanState>
       <LowLimit>10</LowLimit>
       <HighLimit>100</HighLimit>
       <Units>mm</Units>

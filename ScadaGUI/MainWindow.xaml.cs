@@ -36,8 +36,6 @@ namespace ScadaGUI
         public MainWindow() {
             InitializeComponent();
 
-
-
             using (DBModel.IOContext context = new DBModel.IOContext())
             {
                 XmlHandler.DeserializeData(@"../../Configuration.xml");
@@ -48,6 +46,8 @@ namespace ScadaGUI
                 cmb_list.AddRange(context.Tags.OfType<DBModel.AI>().Select(x => x.Name).ToList());
                 tagComboBox.ItemsSource = cmb_list;
             }
+
+            PLCDataHandler.AlarmRaised += OnAlarmRaised;
         }
 
         private void Window_Activated(object sender, EventArgs e) {
@@ -56,7 +56,7 @@ namespace ScadaGUI
 
         private void TagsMenuItem_Click(object sender, RoutedEventArgs e) {
             TagsWindow tags = new TagsWindow();
-            tags.InputListChanged += new EventHandler(OnComboBoxDataChanged);
+            //tags.InputListChanged += new EventHandler(OnComboBoxDataChanged);
             this.Hide();
             tags.ShowDialog();
         }
@@ -128,6 +128,14 @@ namespace ScadaGUI
                 GraphCtl.Model = graph.GraphDisplay;
                 GraphCtl.InvalidatePlot(true);
             }
+        }
+
+        private void OnAlarmRaised() {
+            this.Dispatcher.Invoke(() => {
+                using (var context = new DBModel.IOContext()) {
+                    alarmListView.ItemsSource = context.LogAlarms.ToList();
+                }
+            });
         }
         
     }

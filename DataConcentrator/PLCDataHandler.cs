@@ -15,6 +15,7 @@ using static DataConcentrator.DBModel;
 namespace DataConcentrator {
 
     public delegate void ValueScanned(double val, double time);
+    public delegate void AlarmRaised();
 
     public static class PLCDataHandler {
 
@@ -23,6 +24,7 @@ namespace DataConcentrator {
         private static List<Thread> ActiveThreads = new List<Thread>();
         public static bool PLCStarted = false;
         public static event ValueScanned ValueChanged;
+        public static event AlarmRaised AlarmRaised;
         public static string currently_showing;
         static readonly Object locker = new Object();
 
@@ -54,6 +56,7 @@ namespace DataConcentrator {
         private static void Scanning(string name, double time, string tagAddress, Type type) {
 
             List<Alarm> alarms = new List<Alarm>();
+            int alarm_count = 0;
             while (true) {
                 PLCData[tagAddress] = PLCSim.GetDataForAddress(tagAddress);
                 lock (locker) {
@@ -74,10 +77,16 @@ namespace DataConcentrator {
                         var alarms_above = alarms.FindAll(x => x.Activate == ActiveWhen.ABOVE).Where(x => x.Value > PLCData[tagAddress]);
                         var alarms_below = alarms.FindAll(x => x.Activate == ActiveWhen.BELOW).Where(x => x.Value < PLCData[tagAddress]);
                         if (alarms_above.Any()) {
-                            AddAlarm(name, alarms_above);
+                            if (alarm_count % 5 == 0) {
+                                AddAlarm(name, alarms_above);
+                            }
+                            ++alarm_count;
                         }
                         if (alarms_below.Any()) {
-                            AddAlarm(name, alarms_below);
+                            if (alarm_count % 5 == 0) {
+                                AddAlarm(name, alarms_below);
+                            }
+                            ++alarm_count;
                         }
                     }
                 }
@@ -93,9 +102,12 @@ namespace DataConcentrator {
                     }
 
                     if (alarms != null) {
-                        var alarms_equal = alarms.FindAll(x => x.Activate == ActiveWhen.BELOW).Where(x => x.Value == PLCData[tagAddress]);
+                        var alarms_equal = alarms.FindAll(x => x.Activate == ActiveWhen.EQUALS).Where(x => x.Value == PLCData[tagAddress]);
                         if (alarms_equal.Any()) {
-                            AddAlarm(name, alarms_equal);
+                            if (alarm_count % 5 == 0) {
+                                AddAlarm(name, alarms_equal);
+                            }
+                            ++alarm_count;
                         }
                     }
                 }
@@ -117,12 +129,13 @@ namespace DataConcentrator {
                     alarm.Message = a.Message;
                     alarm.TagId = name;
                     context.LogAlarms.Add(alarm);
+                    AlarmRaised();
                 }
                 context.SaveChanges();
+                
             }
         }
 
-        // TODO: stopping thread entry is deleted from the base?
         public static void TerminateThread(string name) {
             Thread t = ActiveThreads.Find(x => x.Name == name);
             if (t != null) {
@@ -141,7 +154,6 @@ namespace DataConcentrator {
 
         }
 
-        // TODO: forcing outputs when editing fields
         public static void ForceOutput(string addr, double val) {
             if (PLCStarted) {
                 PLCData[addr] = val;
