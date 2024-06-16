@@ -30,42 +30,8 @@ namespace ScadaGUI
             tagNames = new List<string>();
             using (DBModel.IOContext context = new DBModel.IOContext())
             {
-
-                var allDI = context.Tags.OfType<DBModel.DI>().Where(n => n.ScanState == 1).ToList();
-
-                foreach (var tag in allDI)
-                {
-                    int num = tag.Alarms.Count;
-                    for (int i=0; i<num; i++)
-                        tagNames.Add(tag.Name);
-                }
-
-                var allAI = context.Tags.OfType<DBModel.AI>().Where(n => n.ScanState == 1).ToList();
-                foreach (var tag in allAI)
-                {
-                    int num = tag.Alarms.Count;
-                    for (int i = 0; i < num; i++)
-                        tagNames.Add(tag.Name);
-                }
-                List<List<DBModel.Alarm>> alarms = allDI.Select(n => n.Alarms).ToList();
-                alarms.AddRange(allAI.Select(n => n.Alarms));
-
-                List<DBModel.Alarm> a = alarms.Where(list => list.Count > 0).SelectMany(list => list).ToList();
-
-                if (a.Count > 0)
-                {
-                    int i = 0;
-                    dataGridAlarms.ItemsSource = a.Select(n => new
-                    {
-                        Id = n.Id,
-                        Value = n.Value,
-                        Message = n.Message,
-                        Activate = n.Activate,
-                        TagName = tagNames[i++]
-                    });
-
-                }
-
+                List<DBModel.Alarm> alarms = context.Set<DBModel.Alarm>().Where(a => a.Tag.Connected == (byte)1).ToList();
+                dataGridAlarms.ItemsSource = alarms;
             };
         }
 

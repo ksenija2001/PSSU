@@ -57,7 +57,7 @@ namespace ScadaGUI
                         tag.InitialValue = (ckbInitialValue.IsChecked == true) ? (byte)1 : (byte)0;
                         using (DBModel.IOContext context = new DBModel.IOContext())
                         {
-                            DBTagHandler.Create(context, tag);
+                            DBTagHandler.CreateTag(context, tag);
                         }
 
                         OnDataChanged(null);
@@ -77,7 +77,7 @@ namespace ScadaGUI
 
                         using (DBModel.IOContext context = new DBModel.IOContext())
                         {
-                            DBTagHandler.Create(context, tag);
+                            DBTagHandler.CreateTag(context, tag);
                         }
 
                         OnDataChanged(null);

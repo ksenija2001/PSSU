@@ -40,7 +40,6 @@
                     <DataGridTextColumn IsReadOnly="True" Header="ID" Binding="{Binding Id}" />
                     <DataGridTextColumn Header="Value" Binding="{Binding Value}" />
                     <DataGridComboBoxColumn Header="Activate" SelectedItemBinding="{Binding Activate}" />
-                    <DataGridTextColumn IsReadOnly="True" Header="Last alarm" Binding="{Binding AlarmTime}" />
                     <DataGridTextColumn Header="Message" Binding="{Binding Message}" />
                 </DataGrid.Columns>
                 <DataGrid.ContextMenu>

@@ -52,10 +52,12 @@ namespace ScadaGUI
                         tag.Connected = (ckbConnected.IsChecked == true) ? (byte)1 : (byte)0;
                         tag.ScanTime = double.Parse(txtScanTime.Text.Trim());
                         tag.ScanState = (ckbScanState.IsChecked == true) ? (byte)1 : (byte)0;
-                        tag.Alarms = new List<DBModel.Alarm>();
+                        //tag.Alarms = new List<DBModel.Alarm>();
 
-                        using (DBModel.IOContext context = new DBModel.IOContext()) {
-                            DBTagHandler.Create(context, tag);
+
+                        using (DBModel.IOContext context = new DBModel.IOContext())
+                        {
+                            DBTagHandler.CreateTag(context, tag);
                         }
 
                         OnDataChanged(null);
@@ -76,10 +78,11 @@ namespace ScadaGUI
                         tag.LowLimit = double.Parse(txtLow.Text.Trim());
                         tag.HighLimit = double.Parse(txtHigh.Text.Trim());
                         tag.Units = txtUnits.Text.Trim();
-                        tag.Alarms = new List<DBModel.Alarm>();
+                        //tag.Alarms = new List<DBModel.Alarm>();
 
-                        using (DBModel.IOContext context = new DBModel.IOContext()) {
-                                DBTagHandler.Create(context, tag);
+                        using (DBModel.IOContext context = new DBModel.IOContext()) 
+                        {
+                            DBTagHandler.CreateTag(context, tag);
                         }
 
                         OnDataChanged(null);
@@ -196,7 +199,24 @@ namespace ScadaGUI
                     valid = false;
                 }
             }
-                return valid;
+
+            if (ckbConnected.IsChecked == true)
+            {
+                using( DBModel.IOContext context = new DBModel.IOContext())
+                {
+                    var adressOk = context.Tags.Where(n => n.Connected == 1 && n.IOAddress == cmbAddress.Text.Trim()).FirstOrDefault();
+                    if (adressOk != null)
+                    {
+                        ckbConnected.IsChecked = false;
+                    }
+                }
+            }
+
+            if (ckbScanState.IsChecked == true && ckbConnected.IsChecked == false)
+            {
+                ckbScanState.IsChecked = false;
+            }
+            return valid;
         }
 
         private bool IsEmptyField(TextBox Box) {

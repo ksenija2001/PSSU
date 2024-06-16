@@ -10,6 +10,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Collections;
 using System.Xml.Serialization;
 using System.Data.Entity.ModelConfiguration.Conventions;
+using System.Windows;
 
 
 namespace DataConcentrator {
@@ -27,6 +28,8 @@ namespace DataConcentrator {
         public class LogAlarm
         {
             [Key]
+            [DatabaseGenerated(DatabaseGeneratedOption.None)]
+
             public int Id { get; set; }
 
             [Required]
@@ -44,9 +47,10 @@ namespace DataConcentrator {
         [XmlInclude(typeof(Alarm))]
         public class Alarm {
 
-            [DatabaseGenerated(DatabaseGeneratedOption.None)]
 
             [Key]
+            [DatabaseGenerated(DatabaseGeneratedOption.None)]
+
             public int Id {  get; set; }
 
             [Required]
@@ -58,14 +62,19 @@ namespace DataConcentrator {
 
             [Required]
             public string Message { get; set; }
+
+            [ForeignKey("Tag")]
+            public string TagId { get; set; }
+            public virtual Tag Tag { get; set; }
         }
 
         public abstract class Tag
         {
 
-            [DatabaseGenerated(DatabaseGeneratedOption.None)]
 
             [Key]
+            [DatabaseGenerated(DatabaseGeneratedOption.None)]
+
             public string Name { get; set; }
 
             [Required]
