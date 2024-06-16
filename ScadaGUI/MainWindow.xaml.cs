@@ -21,6 +21,8 @@ using System.Data.Entity;
 using System.Data.SqlClient;
 using OxyPlot.Wpf;
 using System.Runtime.Remoting.Contexts;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 
 namespace ScadaGUI
@@ -107,25 +109,26 @@ namespace ScadaGUI
         }
 
         private void OnDataChanged(object sender, EventArgs e) {
-            PLCDataHandler.currently_showing = ((ComboBox)sender).Text;
-            graph.ReinitializeList();
-            GraphCtl.InvalidatePlot(true);
+            if (((ComboBox)sender).SelectedIndex != -1) {
+                PLCDataHandler.currently_showing = ((ComboBox)sender).Text;
+                graph.ReinitializeList();
+                GraphCtl.Model = graph.GraphDisplay;
+                GraphCtl.InvalidatePlot(true);
+            }
         }
     }
 
     public class GraphViewModel {
 
-        public PlotModel GraphDisplay { get; set; }
+        public PlotModel GraphDisplay { get; private set; }
         private LineSeries line = new LineSeries();
-        //private List<double> values = new List<double>();
         private int len = 0;
         
-
         public GraphViewModel() {
             this.GraphDisplay = new PlotModel { Title = "" };
             PLCDataHandler.ValueChanged += DisplayData;
             line.Color = OxyColor.Parse("#FFB39DDB");
-            GraphDisplay.Series.Add(line);
+            this.GraphDisplay.Series.Add(line);
         }
 
         private void DisplayData(double val, double scanTime) {
@@ -137,11 +140,11 @@ namespace ScadaGUI
         public void ReinitializeList() {
             len = 0;
             line.Points.Clear();
-            //GraphDisplay.Series.Clear();
-            //GraphDisplay.Annotations.Clear();
+            GraphDisplay.Series.Clear();
+            GraphDisplay.Series.Add(line);
             GraphDisplay.InvalidatePlot(true);
         }
     }
 
-   
+
 }
