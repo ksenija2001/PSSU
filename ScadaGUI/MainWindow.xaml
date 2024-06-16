@@ -34,7 +34,7 @@
             </Menu.ItemsPanel>
              <MenuItem Margin="20,0,-30,0" Icon="{materialDesign:PackIcon Kind=Database,Size=18}" ToolTip="View tags" Foreground="#FFB39DDB" Click="TagsMenuItem_Click" />
             <MenuItem Margin="20,0,-30,0" Icon="{materialDesign:PackIcon Kind=Alarm,Size=18}" ToolTip="View alarms" Foreground="#FFB39DDB" Click="AlarmsMenuItem_Click"/>
-            <Button Name="btnStart" Content="Start Scanning" Style="{DynamicResource MaterialDesignRaisedLightButton}" HorizontalAlignment="Right" Margin="0,0, -500,0" Click="Start_Click"/>
+            <Button Name="btnStart" Content="Start Scanning"  Style="{DynamicResource MaterialDesignRaisedLightButton}" HorizontalAlignment="Right" Margin="0,0, -500,0" Click="Start_Click"/>
         </Menu>
         <Grid DockPanel.Dock="Left" Width="700">
             <ComboBox Name="tagComboBox" Panel.ZIndex="10" Width="150" BorderThickness="0.5" Margin="0, 30, 30, 0" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Column="1" DropDownClosed="OnDataChanged" />

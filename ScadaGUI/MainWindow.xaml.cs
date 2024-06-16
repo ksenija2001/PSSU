@@ -137,6 +137,9 @@ namespace ScadaGUI
             this.Dispatcher.Invoke(() => {
                 using (var context = new DBModel.IOContext()) {
                     alarmListView.ItemsSource = context.LogAlarms.ToList();
+                    alarmListView.SelectedIndex = alarmListView.Items.Count - 1;
+                    alarmListView.ScrollIntoView(alarmListView.SelectedItem);
+
                 }
             });
         }

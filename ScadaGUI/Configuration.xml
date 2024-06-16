@@ -1,6 +1,30 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Configuration>
   <ArrayOfTag>
+    <Tag p3:type="DO" xmlns:p3="http://www.w3.org/2001/XMLSchema-instance">
+      <Name>DOnesto</Name>
+      <Description>ksenija dodala</Description>
+      <IOAddress>ADDR013</IOAddress>
+      <Connected>1</Connected>
+      <InitialValue>0</InitialValue>
+    </Tag>
+    <Tag p3:type="DI" xmlns:p3="http://www.w3.org/2001/XMLSchema-instance">
+      <Name>nestoDI</Name>
+      <Description>Nesto se desilo</Description>
+      <IOAddress>ADDR009</IOAddress>
+      <Connected>1</Connected>
+      <ScanTime>5</ScanTime>
+      <ScanState>0</ScanState>
+      <Alarms>
+        <Alarm>
+          <Id>1</Id>
+          <Value>1</Value>
+          <Activate>EQUALS</Activate>
+          <Message>Nesto</Message>
+          <TagId>nestoDI</TagId>
+        </Alarm>
+      </Alarms>
+    </Tag>
     <Tag p3:type="AI" xmlns:p3="http://www.w3.org/2001/XMLSchema-instance">
       <Name>Cos</Name>
       <Description>cos</Description>
@@ -13,10 +37,10 @@
       <Units>m</Units>
       <Alarms>
         <Alarm>
-          <Id>3</Id>
-          <Value>5</Value>
-          <Activate>BELOW</Activate>
-          <Message>Cos below 5</Message>
+          <Id>2</Id>
+          <Value>99</Value>
+          <Activate>ABOVE</Activate>
+          <Message>Cos above 99</Message>
           <TagId>Cos</TagId>
         </Alarm>
       </Alarms>
@@ -27,18 +51,11 @@
       <IOAddress>ADDR001</IOAddress>
       <Connected>1</Connected>
       <ScanTime>0.1</ScanTime>
-      <ScanState>0</ScanState>
+      <ScanState>1</ScanState>
       <LowLimit>10</LowLimit>
       <HighLimit>100</HighLimit>
       <Units>mm</Units>
-      <Alarms>
-        <Alarm>
-          <Id>2</Id>
-          <Value>5</Value>
-          <Activate>BELOW</Activate>
-          <Message>daljfafa</Message>
-        </Alarm>
-      </Alarms>
+      <Alarms />
     </Tag>
   </ArrayOfTag>
 </Configuration>

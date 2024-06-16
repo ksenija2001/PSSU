@@ -192,7 +192,7 @@ namespace DataConcentrator
                                             {
                                                 foreach (var aprop in a.GetType().GetProperties())
                                                 {
-                                                    if (!object.Equals(aprop.GetValue(a), aprop.GetValue(basea)))
+                                                    if (aprop.Name != "Tag" && !object.Equals(aprop.GetValue(a), aprop.GetValue(basea)))
                                                     {
                                                         DBTagAlarmHandler.Update(context, a.Id, aprop.Name, aprop.GetValue(a), a);
                                                     }
@@ -253,7 +253,7 @@ namespace DataConcentrator
                                             {
                                                 foreach (var aprop in a.GetType().GetProperties())
                                                 {
-                                                    if (!object.Equals(aprop.GetValue(a), aprop.GetValue(basea)))
+                                                    if (aprop.Name != "Tag" && !object.Equals(aprop.GetValue(a), aprop.GetValue(basea)))
                                                     {
                                                         DBTagAlarmHandler.Update(context, a.Id, aprop.Name, aprop.GetValue(a), a);
                                                     }
@@ -268,12 +268,16 @@ namespace DataConcentrator
                                             }
                                         }
 
-                                        var ala = baseAlarms.Where(n => !ids.Contains(n.Id)).ToList();
-                                        foreach (var item in ala)
+                                        if (ids.Count > 0)
                                         {
-                                            DBTagAlarmHandler.Delete(context, item.Id, item);
+                                            var ala = baseAlarms.Where(n => !ids.Contains(n.Id)).ToList();
+                                            foreach (var item in ala)
+                                            {
+                                                DBTagAlarmHandler.Delete(context, item.Id, item);
 
+                                            }
                                         }
+                                        
                                     }
                                     else if (!object.Equals(prop.GetValue(AIitem), prop.GetValue(baseTag)))
                                     {
@@ -336,15 +340,20 @@ namespace DataConcentrator
                
             }
 
-            using (DBModel.IOContext context = new DBModel.IOContext())
+            if (tagNames.Count > 0)
             {
-                var items = context.Tags.Where(n => !tagNames.Contains(n.Name)).ToList();
-                foreach (var item in items)
+                using (DBModel.IOContext context = new DBModel.IOContext())
                 {
-                    DBTagHandler.DeleteTag(context, item.Name, item);
+                    var items = context.Tags.Where(n => !tagNames.Contains(n.Name)).ToList();
+                    foreach (var item in items)
+                    {
+                        DBTagHandler.DeleteTag(context, item.Name, item);
 
+                    }
                 }
             }
+
+            
         }
 
     }

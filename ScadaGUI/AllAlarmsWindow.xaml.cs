@@ -34,7 +34,7 @@ namespace ScadaGUI
                 var ai = context.Tags.OfType<DBModel.AI>().Where(t => t.ScanState == (byte)1).Select(t => t.Name).ToList();
 
                 alarms = context.Set<DBModel.Alarm>()
-                     .Where(a => a.Tag.Connected == (byte)1 && (di.Contains(a.Tag.Name) || ai.Contains(a.Tag.Name)))
+                     .Where(a => di.Contains(a.TagId) || ai.Contains(a.TagId))
                      .ToList();
             };
 
