@@ -22,7 +22,7 @@
         Activated="Window_Activated" Closed="Window_Closed">
 
     <Window.DataContext>
-        <local:MainViewModel/>
+        <local:GraphViewModel/>
     </Window.DataContext>
 
     <DockPanel>
@@ -37,8 +37,8 @@
             <Button Name="btnStart" Content="Start PLC" Style="{DynamicResource MaterialDesignRaisedLightButton}" HorizontalAlignment="Right" Margin="0,0, -500,0" Click="Start_Click"/>
         </Menu>
         <Grid DockPanel.Dock="Left" Width="700">
-            <ComboBox Name="tagComboBox" Panel.ZIndex="10" Width="150" BorderThickness="0.5" Margin="0, 30, 30, 0" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Column="1"/>
-            <oxy:PlotView Model="{Binding MyModel}" Panel.ZIndex="0" Height="700" Margin="10,0,10,0" Grid.ColumnSpan="2" />
+            <ComboBox Name="tagComboBox" Panel.ZIndex="10" Width="150" BorderThickness="0.5" Margin="0, 30, 30, 0" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Column="1" DropDownClosed="OnDataChanged" />
+            <oxy:PlotView x:Name ="GraphCtl" Model="{Binding GraphDisplay}" Panel.ZIndex="0" Height="700" Margin="10,0,10,0" Grid.ColumnSpan="2" />
         </Grid>
         <ListView Name="alarmListView" DockPanel.Dock="Right">
             <ListViewItem>Hello</ListViewItem>

@@ -130,6 +130,7 @@ namespace ScadaGUI
                 }
 
                 RefreshSources();
+                PLCDataHandler.TerminateThread(((DBModel.Tag)item).Name);
             }
         }
 
