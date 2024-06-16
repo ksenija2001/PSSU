@@ -43,7 +43,18 @@ namespace DataConcentrator
                     di.ScanTime = ((DBModel.DI)tag).ScanTime;
                     di.ScanState = ((DBModel.DI)tag).ScanState;
                     di.IOAddress = tag.IOAddress;
-                    di.Alarms = ((DBModel.DI)tag).Alarms;
+                    di.Alarms = new List<DBModel.Alarm>();
+                    foreach (DBModel.Alarm a in ((DBModel.DI)tag).Alarms)
+                    {
+                        DBModel.Alarm alarm = new DBModel.Alarm();
+                        alarm.Id = a.Id;
+                        alarm.Value = a.Value;
+                        alarm.TagId = a.TagId;
+                        alarm.Message = a.Message;
+                        alarm.Activate = a.Activate;
+                        di.Alarms.Add(alarm);
+
+                    }
                     items.Add(di);
                 }
                 else if (tag is DBModel.AI)
@@ -58,7 +69,18 @@ namespace DataConcentrator
                     ai.LowLimit = ((DBModel.AI)tag).LowLimit;
                     ai.HighLimit = ((DBModel.AI)tag).HighLimit;
                     ai.Units = ((DBModel.AI)tag).Units;
-                    ai.Alarms = ((DBModel.AI)tag).Alarms;
+                    ai.Alarms = new List<DBModel.Alarm>();
+                    foreach (DBModel.Alarm a in ((DBModel.AI)tag).Alarms)
+                    {
+                        DBModel.Alarm alarm = new DBModel.Alarm();
+                        alarm.Id = a.Id;
+                        alarm.Value = a.Value;
+                        alarm.TagId = a.TagId;
+                        alarm.Message = a.Message;
+                        alarm.Activate = a.Activate;
+                        ai.Alarms.Add(alarm);
+
+                    }
                     items.Add(ai);
                 }
                 else if (tag is DBModel.DO)
