@@ -56,7 +56,7 @@ namespace DataConcentrator {
         private static void Scanning(string name, double time, string tagAddress, Type type) {
 
             List<Alarm> alarms = new List<Alarm>();
-            int alarm_count = 0;
+            //int alarm_count = 0;
             double read_value = 0;
             while (true) {
                 lock (locker) {
@@ -80,16 +80,16 @@ namespace DataConcentrator {
                         var alarms_above = alarms.FindAll(x => x.Activate == ActiveWhen.ABOVE).Where(x => x.Value < read_value);
                         var alarms_below = alarms.FindAll(x => x.Activate == ActiveWhen.BELOW).Where(x => x.Value > read_value);
                         if (alarms_above.Any()) {
-                            if (alarm_count % 5 == 0) {
-                                AddAlarm(name, alarms_above);
-                            }
-                            ++alarm_count;
+                            //if (alarm_count % 5 == 0) {
+                            AddAlarm(name, alarms_above);
+                            //}
+                            //++alarm_count;
                         }
                         if (alarms_below.Any()) {
-                            if (alarm_count % 5 == 0) {
-                                AddAlarm(name, alarms_below);
-                            }
-                            ++alarm_count;
+                            //if (alarm_count % 5 == 0) {
+                            AddAlarm(name, alarms_below);
+                            //}
+                            //++alarm_count;
                         }
                     }
                 }
@@ -107,10 +107,10 @@ namespace DataConcentrator {
                     if (alarms != null) {
                         var alarms_equal = alarms.FindAll(x => x.Activate == ActiveWhen.EQUALS).Where(x => x.Value == read_value);
                         if (alarms_equal.Any()) {
-                            if (alarm_count % 5 == 0) {
-                                AddAlarm(name, alarms_equal);
-                            }
-                            ++alarm_count;
+                            //if (alarm_count % 5 == 0) {
+                            AddAlarm(name, alarms_equal);
+                            //}
+                            //++alarm_count;
                         }
                     }
                 }
