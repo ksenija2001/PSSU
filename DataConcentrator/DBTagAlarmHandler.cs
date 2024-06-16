@@ -15,7 +15,7 @@ namespace DataConcentrator
         {
             context.Set<T>().Add(entity);
             context.SaveChanges();
-            MessageBox.Show("[INFO] Create successfull");
+            //MessageBox.Show("[INFO] Create successfull");
 
         }
         public static void Update<T>(DBModel.IOContext context, int id, string propertyName, object propertyValue, T obj) where T : class
@@ -27,7 +27,7 @@ namespace DataConcentrator
                 var value = Convert.ChangeType(propertyValue, property.PropertyType);
                 property.SetValue(entity, value);
                 context.SaveChanges();
-                MessageBox.Show("[INFO] Update successfull");
+                //MessageBox.Show("[INFO] Update successfull");
             }
             else
             {
@@ -49,7 +49,7 @@ namespace DataConcentrator
             {
                 context.Set<T>().Remove(entity);
                 context.SaveChanges();
-                MessageBox.Show("[INFO] Delete successfull");
+                //MessageBox.Show("[INFO] Delete successfull");
             }
             else
             {
