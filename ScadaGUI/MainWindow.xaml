@@ -17,7 +17,7 @@
         FontFamily="{DynamicResource MaterialDesignFont}"  
         ScrollViewer.CanContentScroll="True" 
         WindowStartupLocation="CenterScreen"
-        Width="1200"
+        Width="1300"
         Height="800"
         Activated="Window_Activated" Closed="Window_Closed">
 
@@ -41,21 +41,35 @@
             <oxy:PlotView x:Name ="GraphCtl" Model="{Binding GraphDisplay}" Panel.ZIndex="0" Height="700" Margin="10,0,10,0" Grid.ColumnSpan="2" />
         </Grid>
         <ListView Name="alarmListView" DockPanel.Dock="Right">
-            <ListViewItem>Hello</ListViewItem>
 
-            <Style TargetType="ListViewItem" BasedOn="{StaticResource MaterialDesignListBoxItem}">
-                <Setter Property="Background" Value="Green" />
-            </Style>
             <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="IsEnabled" Value="False"/>
+                <Style TargetType="{x:Type ListViewItem}" >
+                    <Setter Property="FontSize" Value="16" />
+                    <Setter Property="BorderBrush" Value="LightGray" />
+                    <Setter Property="BorderThickness" Value="5,2,5,2" />
+                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                    <!--<Setter Property="IsEnabled" Value="False"/>-->
+                    <Setter Property="IsHitTestVisible" Value="False" />
+                    <Setter Property="Foreground" Value="IndianRed" />
+                    <Setter Property="Margin" Value="0,3,0,3" />
+
                 </Style>
             </ListView.ItemContainerStyle>
+           
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="" DisplayMemberBinding="{Binding AlarmTime, StringFormat={}{0:M d hh:mm:ss tt}}"/>
-                    <GridViewColumn Header=""  DisplayMemberBinding="{Binding Tag}"/>
-                    <GridViewColumn Header=""  DisplayMemberBinding="{Binding Message}"/>
+                    <GridView.ColumnHeaderContainerStyle>
+                        <Style TargetType="{x:Type GridViewColumnHeader}" >
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                            <Setter Property="FontSize" Value="18" />
+                            <Setter Property="IsHitTestVisible" Value="False" />
+                            <Setter Property="FontWeight" Value="Bold" />
+                        </Style>
+                    </GridView.ColumnHeaderContainerStyle>
+                   
+                    <GridViewColumn Width="200" Header="Time" DisplayMemberBinding="{Binding AlarmTime, StringFormat={}{0:y/M/d hh:mm:ss }}"/>
+                    <GridViewColumn Width="100" Header="Tag"  DisplayMemberBinding="{Binding TagId}"/>
+                    <GridViewColumn Width="300" Header="Message"  DisplayMemberBinding="{Binding Message}"/>
                 </GridView>
             </ListView.View>
 
