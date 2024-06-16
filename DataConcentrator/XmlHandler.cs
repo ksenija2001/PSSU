@@ -111,6 +111,7 @@ namespace DataConcentrator
                     typeof(DBModel.LogAlarm),
                 };
 
+                writer.WriteDocType("xml", null, null, null);
                 writer.WriteStartElement("Configuration");
                
                 var nsSerializer = new XmlSerializerNamespaces();
@@ -127,7 +128,13 @@ namespace DataConcentrator
             }
         }
 
-        public static T DeserializeData<T>(DBModel.IOContext context, string path)
+        public static void DeserializeData(DBModel.IOContext context, string path)
+        {
+            var result = DeserializeItem<DBModel.DI>(context, path);
+            Console.WriteLine();
+        }
+
+        public static T DeserializeItem<T>(DBModel.IOContext context, string path)
         {
             XmlSerializer ser = new XmlSerializer(typeof(T));
             T item;

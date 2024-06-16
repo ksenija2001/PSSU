@@ -38,6 +38,7 @@ namespace ScadaGUI
 
             using (DBModel.IOContext context = new DBModel.IOContext())
             {
+                //XmlHandler.DeserializeData(context, @"../../Configuration.xml");
                 alarmListView.Items.Clear();
                 alarmListView.ItemsSource = context.LogAlarms.ToList();
                 tagComboBox.ItemsSource = context.Tags.Select(x => x.Name).ToList();
