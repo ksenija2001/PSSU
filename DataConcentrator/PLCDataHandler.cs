@@ -29,9 +29,6 @@ namespace DataConcentrator {
         public static void ConnectPLC() {
             PLCSim = new PLCSimulatorManager();
             PLCData = PLCSim.GetAllData().ToDictionary(x => x.Key, x => x.Value);
-        }
-
-        public static void PLCStart() {
             PLCSim.StartPLCSimulator();
         }
 
@@ -54,7 +51,6 @@ namespace DataConcentrator {
             }
         }
 
-        // TODO: test alarm logging
         private static void Scanning(string name, double time, string tagAddress, Type type) {
 
             List<Alarm> alarms = new List<Alarm>();

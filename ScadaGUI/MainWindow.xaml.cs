@@ -21,6 +21,8 @@ using System.Data.Entity;
 using System.Data.SqlClient;
 using OxyPlot.Wpf;
 using System.Runtime.Remoting.Contexts;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 
 namespace ScadaGUI
@@ -28,56 +30,55 @@ namespace ScadaGUI
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
-    {
+    public partial class MainWindow : Window {
         GraphViewModel graph = new GraphViewModel();
 
-        public MainWindow()
-        {
+        public MainWindow() {
             InitializeComponent();
+
+
 
             using (DBModel.IOContext context = new DBModel.IOContext())
             {
                 XmlHandler.DeserializeData(@"../../Configuration.xml");
+
                 alarmListView.Items.Clear();
                 alarmListView.ItemsSource = context.LogAlarms.ToList();
-                tagComboBox.ItemsSource = context.Tags.Select(x => x.Name).ToList();
+                var cmb_list = context.Tags.OfType<DBModel.DI>().Select(x => x.Name).ToList();
+                cmb_list.AddRange(context.Tags.OfType<DBModel.AI>().Select(x => x.Name).ToList());
+                tagComboBox.ItemsSource = cmb_list;
             }
         }
 
-        private void Window_Activated(object sender, EventArgs e)
-        {
-           
+        private void Window_Activated(object sender, EventArgs e) {
+
         }
 
-        private void TagsMenuItem_Click(object sender, RoutedEventArgs e)
-        {
+        private void TagsMenuItem_Click(object sender, RoutedEventArgs e) {
             TagsWindow tags = new TagsWindow();
+            tags.InputListChanged += new EventHandler(OnComboBoxDataChanged);
             this.Hide();
             tags.ShowDialog();
         }
 
-        private void AlarmsMenuItem_Click(object sender, RoutedEventArgs e)
-        {
+        private void AlarmsMenuItem_Click(object sender, RoutedEventArgs e) {
             AllAlarmsWindow alarms = new AllAlarmsWindow();
             this.Hide();
             alarms.ShowDialog();
         }
+
 
         private void Window_Closed(object sender, EventArgs e)
         {
             using (DBModel.IOContext context = new DBModel.IOContext())
             {
                XmlHandler.SerializeData(context, @"../../Configuration.xml");
-
             }
 
             PLCDataHandler.TerminateAllThreads();
         }
 
         private void Start_Click(object sender, EventArgs e) {
-            
-            PLCDataHandler.PLCStart();
 
             List<DBModel.DI> tagsDI;
             using (var context = new DBModel.IOContext()) {
@@ -94,7 +95,7 @@ namespace ScadaGUI
                 tagsAI = context.Tags.OfType<DBModel.AI>().ToList();
                 tagComboBox.ItemsSource = context.Tags.Select(x => x.Name).ToList();
             }
-           
+
             foreach (var entry in tagsAI) {
                 if (Convert.ToBoolean(entry.ScanState) && Convert.ToBoolean(entry.Connected)) {
                     PLCDataHandler.StartScanner(entry, entry.GetType().BaseType);
@@ -102,30 +103,46 @@ namespace ScadaGUI
             }
 
             PLCDataHandler.PLCStarted = true;
-            MessageBox.Show("PLC started successfully");
-            
+            MessageBox.Show("Scanning started successfully");
+
         }
 
         private void OnDataChanged(object sender, EventArgs e) {
-            PLCDataHandler.currently_showing = ((ComboBox)sender).Text;
-            graph.ReinitializeList();
-            GraphCtl.InvalidatePlot(true);
+            if (((ComboBox)sender).SelectedIndex != -1) {
+                PLCDataHandler.currently_showing = ((ComboBox)sender).Text;
+                graph.ReinitializeList();
+                GraphCtl.Model = graph.GraphDisplay;
+                GraphCtl.InvalidatePlot(true);
+            }
         }
+
+        private void OnComboBoxDataChanged(object sender, EventArgs e) {
+            using (DBModel.IOContext context = new DBModel.IOContext()) {
+                var cmb_list = context.Tags.OfType<DBModel.DI>().Select(x => x.Name).ToList();
+                cmb_list.AddRange(context.Tags.OfType<DBModel.AI>().Select(x => x.Name).ToList());
+                tagComboBox.ItemsSource = cmb_list;
+            }
+
+            if (PLCDataHandler.currently_showing == null) {
+                graph.ReinitializeList();
+                GraphCtl.Model = graph.GraphDisplay;
+                GraphCtl.InvalidatePlot(true);
+            }
+        }
+        
     }
 
     public class GraphViewModel {
 
-        public PlotModel GraphDisplay { get; set; }
+        public PlotModel GraphDisplay { get; private set; }
         private LineSeries line = new LineSeries();
-        //private List<double> values = new List<double>();
         private int len = 0;
         
-
         public GraphViewModel() {
             this.GraphDisplay = new PlotModel { Title = "" };
             PLCDataHandler.ValueChanged += DisplayData;
             line.Color = OxyColor.Parse("#FFB39DDB");
-            GraphDisplay.Series.Add(line);
+            this.GraphDisplay.Series.Add(line);
         }
 
         private void DisplayData(double val, double scanTime) {
@@ -137,11 +154,11 @@ namespace ScadaGUI
         public void ReinitializeList() {
             len = 0;
             line.Points.Clear();
-            //GraphDisplay.Series.Clear();
-            //GraphDisplay.Annotations.Clear();
+            GraphDisplay.Series.Clear();
+            GraphDisplay.Series.Add(line);
             GraphDisplay.InvalidatePlot(true);
         }
     }
 
-   
+
 }
