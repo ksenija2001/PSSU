@@ -62,7 +62,7 @@ namespace ScadaGUI
 
                         OnDataChanged(null);
 
-                        if (Convert.ToBoolean(tag.ScanState) && Convert.ToBoolean(tag.Connected)) {
+                        if (Convert.ToBoolean(tag.ScanState) && Convert.ToBoolean(tag.Connected) && PLCDataHandler.PLCStarted) {
                             PLCDataHandler.StartScanner(tag, tag.GetType());
                         }
 
@@ -87,7 +87,7 @@ namespace ScadaGUI
 
                         OnDataChanged(null);
 
-                        if (Convert.ToBoolean(tag.ScanState) && Convert.ToBoolean(tag.Connected)) {
+                        if (Convert.ToBoolean(tag.ScanState) && Convert.ToBoolean(tag.Connected) && PLCDataHandler.PLCStarted) {
                             PLCDataHandler.StartScanner(tag, tag.GetType());
                         }
 
