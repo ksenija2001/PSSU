@@ -129,9 +129,27 @@ namespace ScadaGUI
                         PLCDataHandler.currently_showing = null;
                     }
                     if (IO && dg == dataGridDITags)
+                    {
+                        DBModel.DI data = DBTagHandler.FindTag<DBModel.DI>(context, ((DBModel.Tag)item).Name);
+                        List<DBModel.Alarm> alarms = data.Alarms.ToList();
+                        foreach(DBModel.Alarm alarm in alarms)
+                        {
+                            DBTagAlarmHandler.Delete(context, alarm.Id, alarm);
+                        }
+
                         DBTagHandler.DeleteTag(context, ((DBModel.Tag)item).Name, (DBModel.DI)item);
+
+                    }
                     else if (IO && dg == dataGridAITags)
+                    {
+                        DBModel.AI data = DBTagHandler.FindTag<DBModel.AI>(context, ((DBModel.Tag)item).Name);
+                        foreach (DBModel.Alarm alarm in data.Alarms)
+                        {
+                            DBTagAlarmHandler.Delete(context, alarm.Id, alarm);
+                        }
                         DBTagHandler.DeleteTag(context, ((DBModel.Tag)item).Name, (DBModel.AI)item);
+
+                    }
                     else if (!IO && dg == dataGridDITags)
                         DBTagHandler.DeleteTag(context, ((DBModel.Tag)item).Name, (DBModel.DO)item);
                     else if (!IO && dg == dataGridAITags)

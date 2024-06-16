@@ -36,7 +36,12 @@ namespace ScadaGUI
         public MainWindow() {
             InitializeComponent();
 
-            using (DBModel.IOContext context = new DBModel.IOContext()) {
+
+
+            using (DBModel.IOContext context = new DBModel.IOContext())
+            {
+                XmlHandler.DeserializeData(@"../../Configuration.xml");
+
                 alarmListView.Items.Clear();
                 alarmListView.ItemsSource = context.LogAlarms.ToList();
                 var cmb_list = context.Tags.OfType<DBModel.DI>().Select(x => x.Name).ToList();
@@ -62,11 +67,12 @@ namespace ScadaGUI
             alarms.ShowDialog();
         }
 
-        private void Window_Closed(object sender, EventArgs e) {
-            using (DBModel.IOContext context = new DBModel.IOContext()) {
-                using (DBModel.IOContext context1 = new DBModel.IOContext())
-                    XmlHandler.SerializeData(context1, context, @"../../Configuration.xml");
 
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            using (DBModel.IOContext context = new DBModel.IOContext())
+            {
+               XmlHandler.SerializeData(context, @"../../Configuration.xml");
             }
 
             PLCDataHandler.TerminateAllThreads();

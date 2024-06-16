@@ -34,8 +34,8 @@
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="ID" Binding="{Binding Id}" />
                     <DataGridTextColumn Header="Value" Binding="{Binding Value}" />
-                    <DataGridTextColumn Header="Last alarms" Binding="{Binding AlarmTime}" />
-                    <DataGridTextColumn Header="Message" Binding="{Binding Message}" />
+                    <DataGridTextColumn Header="Activate on" Binding="{Binding Activate}" />
+                    <DataGridTextColumn Width="250"  Header="Message" Binding="{Binding Message}"/>
                     <DataGridTextColumn Header="Tag Name" Binding="{Binding TagId}" />
                 </DataGrid.Columns>
             </DataGrid>

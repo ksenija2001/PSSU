@@ -26,13 +26,20 @@ namespace ScadaGUI
         public AllAlarmsWindow()
         {
             InitializeComponent();
-            
-            tagNames = new List<string>();
+
+            List<DBModel.Alarm> alarms;
             using (DBModel.IOContext context = new DBModel.IOContext())
             {
-                List<DBModel.Alarm> alarms = context.Set<DBModel.Alarm>().Where(a => a.Tag.Connected == (byte)1).ToList();
-                dataGridAlarms.ItemsSource = alarms;
+                var di = context.Tags.OfType<DBModel.DI>().Where(t => t.ScanState == (byte)1).Select(t => t.Name).ToList();
+                var ai = context.Tags.OfType<DBModel.AI>().Where(t => t.ScanState == (byte)1).Select(t => t.Name).ToList();
+
+                alarms = context.Set<DBModel.Alarm>()
+                     .Where(a => a.Tag.Connected == (byte)1 && (di.Contains(a.Tag.Name) || ai.Contains(a.Tag.Name)))
+                     .ToList();
             };
+
+            dataGridAlarms.ItemsSource = alarms;
+
         }
 
         private void MenuItemBack_Click(object sender, RoutedEventArgs e)
