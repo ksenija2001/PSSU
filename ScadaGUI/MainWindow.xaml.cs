@@ -42,6 +42,9 @@ namespace ScadaGUI
 
                 alarmListView.Items.Clear();
                 alarmListView.ItemsSource = context.LogAlarms.ToList();
+                alarmListView.SelectedIndex = alarmListView.Items.Count - 1;
+                alarmListView.ScrollIntoView(alarmListView.SelectedItem);
+
                 var cmb_list = context.Tags.OfType<DBModel.DI>().Select(x => x.Name).ToList();
                 cmb_list.AddRange(context.Tags.OfType<DBModel.AI>().Select(x => x.Name).ToList());
                 tagComboBox.ItemsSource = cmb_list;
