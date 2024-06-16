@@ -57,12 +57,14 @@ namespace DataConcentrator {
 
             List<Alarm> alarms = new List<Alarm>();
             int alarm_count = 0;
+            double read_value = 0;
             while (true) {
-                PLCData[tagAddress] = PLCSim.GetDataForAddress(tagAddress);
                 lock (locker) {
+                    PLCData[tagAddress] = PLCSim.GetDataForAddress(tagAddress);
                     if (currently_showing == name) {
                         ValueChanged(PLCData[tagAddress], time);
                     }
+                    read_value = PLCData[tagAddress];
                 }
                 if (type == typeof(DBModel.AI)) {
 
@@ -74,8 +76,9 @@ namespace DataConcentrator {
                     }
 
                     if (alarms != null) {
-                        var alarms_above = alarms.FindAll(x => x.Activate == ActiveWhen.ABOVE).Where(x => x.Value > PLCData[tagAddress]);
-                        var alarms_below = alarms.FindAll(x => x.Activate == ActiveWhen.BELOW).Where(x => x.Value < PLCData[tagAddress]);
+
+                        var alarms_above = alarms.FindAll(x => x.Activate == ActiveWhen.ABOVE).Where(x => x.Value < read_value);
+                        var alarms_below = alarms.FindAll(x => x.Activate == ActiveWhen.BELOW).Where(x => x.Value > read_value);
                         if (alarms_above.Any()) {
                             if (alarm_count % 5 == 0) {
                                 AddAlarm(name, alarms_above);
@@ -102,7 +105,7 @@ namespace DataConcentrator {
                     }
 
                     if (alarms != null) {
-                        var alarms_equal = alarms.FindAll(x => x.Activate == ActiveWhen.EQUALS).Where(x => x.Value == PLCData[tagAddress]);
+                        var alarms_equal = alarms.FindAll(x => x.Activate == ActiveWhen.EQUALS).Where(x => x.Value == read_value);
                         if (alarms_equal.Any()) {
                             if (alarm_count % 5 == 0) {
                                 AddAlarm(name, alarms_equal);
