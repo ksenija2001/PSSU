@@ -38,7 +38,7 @@ namespace ScadaGUI
 
             using (DBModel.IOContext context = new DBModel.IOContext())
             {
-                //XmlHandler.DeserializeData(context, @"../../Configuration.xml");
+                XmlHandler.DeserializeData(@"../../Configuration.xml");
                 alarmListView.Items.Clear();
                 alarmListView.ItemsSource = context.LogAlarms.ToList();
                 tagComboBox.ItemsSource = context.Tags.Select(x => x.Name).ToList();
@@ -68,8 +68,7 @@ namespace ScadaGUI
         {
             using (DBModel.IOContext context = new DBModel.IOContext())
             {
-                using(DBModel.IOContext context1 = new DBModel.IOContext())
-                    XmlHandler.SerializeData(context1, context, @"../../Configuration.xml");
+               XmlHandler.SerializeData(context, @"../../Configuration.xml");
 
             }
 
