@@ -40,8 +40,8 @@ namespace ScadaGUI
             {
                 XmlHandler.DeserializeData(@"../../Configuration.xml");
 
-                alarmListView.Items.Clear();
                 alarmListView.ItemsSource = context.LogAlarms.ToList();
+
                 alarmListView.SelectedIndex = alarmListView.Items.Count - 1;
                 alarmListView.ScrollIntoView(alarmListView.SelectedItem);
 
