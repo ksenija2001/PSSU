@@ -151,9 +151,9 @@ namespace DataConcentrator {
             foreach (var thread in ActiveThreads) {
                 thread.Abort();
             }
-            if (PLCStarted) {
-                PLCSim.Abort();
-            }
+
+            PLCSim.Abort();
+
 
         }
 
