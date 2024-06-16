@@ -102,23 +102,22 @@ namespace ScadaGUI
                     DBModel.Alarm alarm;
                     using (DBModel.IOContext context = new DBModel.IOContext())
                     {
-
                         if (tagType == typeof(DBModel.DI))
                         {
-                            DBModel.DI tag = context.Tags.OfType<DBModel.DI>().Where(n => n.Name == tagName).FirstOrDefault();
+                            DBModel.DI tag = DBTagHandler.FindTag<DBModel.DI>(context, tagName);
                             alarm = tag.Alarms.Where(n => n.Id == item.Id).FirstOrDefault();
                         }
                         else
                         {
-                            DBModel.AI tag = context.Tags.OfType<DBModel.AI>().Where(n => n.Name == tagName).FirstOrDefault();
+                            DBModel.AI tag = DBTagHandler.FindTag<DBModel.AI>(context, tagName);
                             alarm = tag.Alarms.Where(n => n.Id == item.Id).FirstOrDefault();
                         }
 
                         alarm.Value = item.Value;
                         alarm.Activate = item.Activate;
                         alarm.Message = item.Message;
-                        context.SaveChanges();
 
+                        context.SaveChanges();
                     }
 
                     dataGridAlarms.UnselectAllCells();
@@ -163,20 +162,27 @@ namespace ScadaGUI
 
             if (response == MessageBoxResult.Yes)
             {
+                int id = ((DBModel.Alarm)item).Id;
                 using (DBModel.IOContext context = new DBModel.IOContext())
                 {
-                    var data = context.Tags.Where(n => n.Name == tagName).FirstOrDefault();
-                    if (data.GetType() == typeof(DBModel.AI))
+                    if (tagType == typeof(DBModel.AI))
                     {
-                        DBModel.Alarm alarm = ((DBModel.AI)data).Alarms.Where(n => n.Id == ((DBModel.Alarm)item).Id).FirstOrDefault();
-                        ((DBModel.AI)data).Alarms.Remove(alarm);
-                        DBTagHandler.Update(context, (DBModel.AI)data);
+                        DBModel.AI data = DBTagHandler.FindTag<DBModel.AI>(context, tagName);
+                        DBModel.Alarm alarm = data.Alarms.Where(n => n.Id == id).FirstOrDefault();
+                        DBTagAlarmHandler.Delete(context, id, alarm);
+                        List<DBModel.Alarm> al = data.Alarms.ToList();
+                        al.Remove(alarm);
+                        DBTagHandler.UpdateTag(context, tagName, "Alarms", al, data);
+                    
                     }
                     else
                     {
-                        DBModel.Alarm alarm = ((DBModel.DI)data).Alarms.Where(n => n.Id == ((DBModel.Alarm)item).Id).FirstOrDefault();
-                        ((DBModel.DI)data).Alarms.Remove(alarm);
-                        DBTagHandler.Update(context, (DBModel.DI)data);
+                        DBModel.DI data = DBTagHandler.FindTag<DBModel.DI>(context, tagName);
+                        DBModel.Alarm alarm = data.Alarms.Where(n => n.Id == id).FirstOrDefault();
+                        DBTagAlarmHandler.Delete(context, id, alarm);
+                        List<DBModel.Alarm> al = data.Alarms.ToList();
+                        al.Remove(alarm);
+                        DBTagHandler.UpdateTag(context, tagName, "Alarms", al, data);
                     }
                 }
 
