@@ -97,7 +97,7 @@ namespace ScadaGUI
             }
 
             PLCDataHandler.PLCStarted = true;
-            MessageBox.Show("PLC started successfully");
+            MessageBox.Show("Scanning started successfully");
 
         }
 
@@ -115,6 +115,12 @@ namespace ScadaGUI
                 var cmb_list = context.Tags.OfType<DBModel.DI>().Select(x => x.Name).ToList();
                 cmb_list.AddRange(context.Tags.OfType<DBModel.AI>().Select(x => x.Name).ToList());
                 tagComboBox.ItemsSource = cmb_list;
+            }
+
+            if (PLCDataHandler.currently_showing == null) {
+                graph.ReinitializeList();
+                GraphCtl.Model = graph.GraphDisplay;
+                GraphCtl.InvalidatePlot(true);
             }
         }
         

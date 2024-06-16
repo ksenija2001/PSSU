@@ -125,6 +125,9 @@ namespace ScadaGUI
             {
                 using (DBModel.IOContext context = new DBModel.IOContext())
                 {
+                    if (((DBModel.Tag)item).Name == PLCDataHandler.currently_showing){
+                        PLCDataHandler.currently_showing = null;
+                    }
                     if (IO && dg == dataGridDITags)
                         DBTagHandler.DeleteTag(context, ((DBModel.Tag)item).Name, (DBModel.DI)item);
                     else if (IO && dg == dataGridAITags)

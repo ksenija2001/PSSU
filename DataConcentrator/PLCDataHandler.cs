@@ -51,7 +51,6 @@ namespace DataConcentrator {
             }
         }
 
-        // TODO: test alarm logging
         private static void Scanning(string name, double time, string tagAddress, Type type) {
 
             List<Alarm> alarms = new List<Alarm>();
