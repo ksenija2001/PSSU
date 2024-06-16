@@ -172,7 +172,10 @@ namespace DataConcentrator
                         using (DBModel.IOContext context = new DBModel.IOContext())
                         {
                             var baseTag = DBTagHandler.FindTag<DBModel.DI>(context, DIitem.Name);
-                            var baseAlarms = baseTag.Alarms.ToList();
+                            List<DBModel.Alarm> baseAlarms = null;
+                            if (baseTag.Alarms.Count > 0)
+                                baseAlarms = baseTag.Alarms.ToList();
+                            
                             if (baseTag != null)
                             {
                                 foreach (var prop in DIitem.GetType().GetProperties())
@@ -228,7 +231,9 @@ namespace DataConcentrator
                         using (DBModel.IOContext context = new DBModel.IOContext())
                         {
                             var baseTag = DBTagHandler.FindTag<DBModel.AI>(context, AIitem.Name);
-                            var baseAlarms = baseTag.Alarms.ToList();
+                            List<DBModel.Alarm> baseAlarms = null;
+                            if (baseTag.Alarms.Count > 0)
+                                baseAlarms = baseTag.Alarms.ToList();
 
                             if (baseTag != null)
                             {
