@@ -59,7 +59,7 @@ namespace ScadaGUI
 
         private void TagsMenuItem_Click(object sender, RoutedEventArgs e) {
             TagsWindow tags = new TagsWindow();
-            //tags.InputListChanged += new EventHandler(OnComboBoxDataChanged);
+            tags.InputListChanged += new EventHandler(OnComboBoxDataChanged);
             this.Hide();
             tags.ShowDialog();
         }

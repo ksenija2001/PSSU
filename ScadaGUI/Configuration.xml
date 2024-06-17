@@ -2,60 +2,48 @@
 <Configuration>
   <ArrayOfTag>
     <Tag p3:type="DO" xmlns:p3="http://www.w3.org/2001/XMLSchema-instance">
-      <Name>DOnesto</Name>
-      <Description>ksenija dodala</Description>
+      <Name>DO</Name>
+      <Description>Digital output</Description>
       <IOAddress>ADDR013</IOAddress>
       <Connected>1</Connected>
       <InitialValue>0</InitialValue>
     </Tag>
     <Tag p3:type="DI" xmlns:p3="http://www.w3.org/2001/XMLSchema-instance">
-      <Name>nestoDI</Name>
-      <Description>Nesto se desilo</Description>
+      <Name>DI</Name>
+      <Description>Alternating</Description>
       <IOAddress>ADDR009</IOAddress>
       <Connected>1</Connected>
-      <ScanTime>5</ScanTime>
-      <ScanState>0</ScanState>
+      <ScanTime>1</ScanTime>
+      <ScanState>1</ScanState>
       <Alarms>
         <Alarm>
           <Id>1</Id>
           <Value>1</Value>
           <Activate>EQUALS</Activate>
-          <Message>Nesto</Message>
-          <TagId>nestoDI</TagId>
+          <Message>DI activated</Message>
+          <TagId>DI</TagId>
         </Alarm>
       </Alarms>
     </Tag>
     <Tag p3:type="AI" xmlns:p3="http://www.w3.org/2001/XMLSchema-instance">
-      <Name>Cos</Name>
-      <Description>cos</Description>
-      <IOAddress>ADDR003</IOAddress>
+      <Name>Sine</Name>
+      <Description>Sine wave</Description>
+      <IOAddress>ADDR001</IOAddress>
       <Connected>1</Connected>
       <ScanTime>1</ScanTime>
       <ScanState>1</ScanState>
       <LowLimit>0</LowLimit>
-      <HighLimit>5</HighLimit>
+      <HighLimit>100</HighLimit>
       <Units>m</Units>
       <Alarms>
         <Alarm>
           <Id>2</Id>
           <Value>99</Value>
           <Activate>ABOVE</Activate>
-          <Message>Cos above 99</Message>
-          <TagId>Cos</TagId>
+          <Message>Sine above 99</Message>
+          <TagId>Sine</TagId>
         </Alarm>
       </Alarms>
-    </Tag>
-    <Tag p3:type="AI" xmlns:p3="http://www.w3.org/2001/XMLSchema-instance">
-      <Name>nestoAI</Name>
-      <Description>nesto</Description>
-      <IOAddress>ADDR001</IOAddress>
-      <Connected>1</Connected>
-      <ScanTime>0.1</ScanTime>
-      <ScanState>1</ScanState>
-      <LowLimit>10</LowLimit>
-      <HighLimit>100</HighLimit>
-      <Units>mm</Units>
-      <Alarms />
     </Tag>
   </ArrayOfTag>
 </Configuration>

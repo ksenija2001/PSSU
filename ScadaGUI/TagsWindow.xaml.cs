@@ -143,7 +143,8 @@ namespace ScadaGUI
                     else if (IO && dg == dataGridAITags)
                     {
                         DBModel.AI data = DBTagHandler.FindTag<DBModel.AI>(context, ((DBModel.Tag)item).Name);
-                        foreach (DBModel.Alarm alarm in data.Alarms)
+                        List<DBModel.Alarm> alarms = data.Alarms.ToList();
+                        foreach (DBModel.Alarm alarm in alarms)
                         {
                             DBTagAlarmHandler.Delete(context, alarm.Id, alarm);
                         }

@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media.Animation;
 using System.Xml.Linq;
 using PLCSimulator;
@@ -120,22 +121,26 @@ namespace DataConcentrator {
         }
 
         public static void AddAlarm(string name, IEnumerable<DBModel.Alarm> filtered_alarms) {
-            using (var context = new DBModel.IOContext()) {
-                foreach (var a in filtered_alarms) {
-                    LogAlarm alarm = new LogAlarm();
-                    if (context.LogAlarms.ToList().Count > 0)
-                        alarm.Id = context.LogAlarms.Max(x => x.Id) + 1;
-                    else
-                        alarm.Id = 1;
+            try {
+                using (var context = new DBModel.IOContext()) {
+                    foreach (var a in filtered_alarms) {
+                        LogAlarm alarm = new LogAlarm();
+                        if (context.LogAlarms.ToList().Count > 0)
+                            alarm.Id = context.LogAlarms.Max(x => x.Id) + 1;
+                        else
+                            alarm.Id = 1;
 
-                    alarm.AlarmTime = DateTime.Now;
-                    alarm.Message = a.Message;
-                    alarm.TagId = name;
-                    context.LogAlarms.Add(alarm);
-                    AlarmRaised();
+                        alarm.AlarmTime = DateTime.Now;
+                        alarm.Message = a.Message;
+                        alarm.TagId = name;
+                        context.LogAlarms.Add(alarm);
+                        AlarmRaised();
+                    }
+                    context.SaveChanges();
+
                 }
-                context.SaveChanges();
-                
+            }
+            catch {
             }
         }
 
