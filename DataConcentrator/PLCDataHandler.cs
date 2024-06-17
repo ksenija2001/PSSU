@@ -163,10 +163,8 @@ namespace DataConcentrator {
         }
 
         public static void ForceOutput(string addr, double val) {
-            if (PLCStarted) {
-                PLCData[addr] = val;
-                PLCSim.SetValue(addr, val);
-            }
+            PLCData[addr] = val;
+            PLCSim.SetValue(addr, val);
         }
     } 
 }

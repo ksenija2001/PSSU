@@ -323,6 +323,16 @@ namespace ScadaGUI
                                 el.IsChecked = false;
                                 return;
                             }
+
+                            if ((byte)value == 1 && !IO) {
+                                if (dg == dataGridDITags) {
+                                    PLCDataHandler.ForceOutput(item.IOAddress, ((DBModel.DO)item).InitialValue);
+                                }
+                                else {
+                                    PLCDataHandler.ForceOutput(item.IOAddress, ((DBModel.AO)item).InitialValue);
+                                }
+                                
+                        }
                         }
 
                         if ((byte)value == 0)
@@ -344,6 +354,7 @@ namespace ScadaGUI
                                     DBTagHandler.UpdateTag(context, name, "ScanState", value, (DBModel.AO)item);
                             }
                         }
+
                     }
                     else if (bindingPath == "ScanState")
                     {
