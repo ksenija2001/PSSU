@@ -61,7 +61,10 @@ namespace ScadaGUI
                         }
 
                         OnDataChanged(null);
-                        PLCDataHandler.ForceOutput(tag.IOAddress, tag.InitialValue);
+                        if (Convert.ToBoolean(tag.Connected)) {
+                            PLCDataHandler.ForceOutput(tag.IOAddress, tag.InitialValue);
+                        }
+                        
                     }
                     else if (rbAI.IsChecked == true)
                     {
@@ -82,7 +85,9 @@ namespace ScadaGUI
                         }
 
                         OnDataChanged(null);
-                        PLCDataHandler.ForceOutput(tag.IOAddress, tag.InitialValue);
+                        if (Convert.ToBoolean(tag.Connected)) {
+                            PLCDataHandler.ForceOutput(tag.IOAddress, tag.InitialValue);
+                        }
 
                     }
                     else
