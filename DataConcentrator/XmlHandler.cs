@@ -137,139 +137,98 @@ namespace DataConcentrator
 
         public static void DeserializeData(string path)
         {
-            XDocument xml = XDocument.Load(path);
-
-            // List of all tags that need to be in the database after launching the application
-            var tags = xml.Root.Elements("ArrayOfTag").Elements("Tag").ToList();
-
-            // Definitions of needed serializers
-            var DIser = new XmlSerializer(typeof(DBModel.DI));
-            var AIser = new XmlSerializer(typeof(DBModel.AI));
-            var DOser = new XmlSerializer(typeof(DBModel.DO));
-            var AOser = new XmlSerializer(typeof(DBModel.AO));
-
-            List<string> tagNames = new List<string>();
-
-            foreach (var tag in tags)
+            try
             {
-                // Removing namespaces made during serialization
-                foreach (XElement XE in tag.DescendantsAndSelf())
+                using (DBModel.IOContext context = new DBModel.IOContext())
                 {
-                    XE.Name = XE.Name.LocalName;
-                    XE.ReplaceAttributes((from xattrib in XE.Attributes().Where(xa => !xa.IsNamespaceDeclaration) select new XAttribute(xattrib.Name.LocalName, xattrib.Value)));
+                    if (context.Database.Exists())
+                    {
+                        var response = MessageBox.Show("Existing database detected, if it differs too much from the configuration you are trying to load problems will occur. Would you like to overwritte the local database?", "Question", MessageBoxButton.YesNo);
+                        if (response == MessageBoxResult.Yes)
+                        {
+                            context.Database.Connection.Close();
+                            context.Database.Delete();
+                            MessageBox.Show("Local database has been deleted. Loading configuration...");
+                        }
+                        else
+                        {
+                            MessageBox.Show("Trying to update local database with configuration...");
+                        }
+                    }
+                    
                 }
 
-                var type = tag.Attribute("type").Value;
-                tag.Name = type;
+                XDocument xml = XDocument.Load(path);
 
-                // Deserialization of all tags based on their type
-                // Depending of what is already in the database, tags can be updated or created
-                switch (type)
+                // List of all tags that need to be in the database after launching the application
+                var tags = xml.Root.Elements("ArrayOfTag").Elements("Tag").ToList();
+
+                // Definitions of needed serializers
+                var DIser = new XmlSerializer(typeof(DBModel.DI));
+                var AIser = new XmlSerializer(typeof(DBModel.AI));
+                var DOser = new XmlSerializer(typeof(DBModel.DO));
+                var AOser = new XmlSerializer(typeof(DBModel.AO));
+
+                List<string> tagNames = new List<string>();
+
+                foreach (var tag in tags)
                 {
-                    case "DI":
-                        DBModel.DI DIitem = (DBModel.DI)DIser.Deserialize(tag.CreateReader());
-                        tagNames.Add(DIitem.Name);
-                        using (DBModel.IOContext context = new DBModel.IOContext())
-                        {
-                            var baseTag = DBTagHandler.FindTag<DBModel.DI>(context, DIitem.Name);
-                            
-                            if (baseTag != null)
-                            {
-                                List<DBModel.Alarm> baseAlarms = null;
-                                if (baseTag.Alarms.Count > 0)
-                                    baseAlarms = baseTag.Alarms.ToList();
+                    // Removing namespaces made during serialization
+                    foreach (XElement XE in tag.DescendantsAndSelf())
+                    {
+                        XE.Name = XE.Name.LocalName;
+                        XE.ReplaceAttributes((from xattrib in XE.Attributes().Where(xa => !xa.IsNamespaceDeclaration) select new XAttribute(xattrib.Name.LocalName, xattrib.Value)));
+                    }
 
-                                foreach (var prop in DIitem.GetType().GetProperties())
+                    var type = tag.Attribute("type").Value;
+                    tag.Name = type;
+
+                    // Deserialization of all tags based on their type
+                    // Depending of what is already in the database, tags can be updated or created
+                    switch (type)
+                    {
+                        case "DI":
+                            DBModel.DI DIitem = (DBModel.DI)DIser.Deserialize(tag.CreateReader());
+                            tagNames.Add(DIitem.Name);
+                            using (DBModel.IOContext context = new DBModel.IOContext())
+                            {
+                                var baseTag = DBTagHandler.FindTag<DBModel.DI>(context, DIitem.Name);
+
+                                if (baseTag != null)
                                 {
-                                    if (prop.Name == "Alarms")
+                                    List<DBModel.Alarm> baseAlarms = new List<Alarm>();
+                                    if (baseTag.Alarms.Count > 0)
+                                        baseAlarms = baseTag.Alarms.ToList();
+
+                                    foreach (var prop in DIitem.GetType().GetProperties())
                                     {
-                                        List<int> ids = new List<int>();
-                                        foreach (var a in DIitem.Alarms)
+                                        if (prop.Name == "Alarms")
                                         {
-                                            ids.Add(a.Id);
-                                            var basea = baseAlarms.Where(n => n.Id == a.Id).FirstOrDefault();
-                                            if (basea != default(DBModel.Alarm))
+                                            List<int> ids = new List<int>();
+                                            foreach (var a in DIitem.Alarms)
                                             {
-                                                foreach (var aprop in a.GetType().GetProperties())
+                                                ids.Add(a.Id);
+
+                                                var basea = baseAlarms.Where(n => n.Id == a.Id).FirstOrDefault();
+                                                if (basea != default(DBModel.Alarm))
                                                 {
-                                                    if (aprop.Name != "Tag" && !object.Equals(aprop.GetValue(a), aprop.GetValue(basea)))
+                                                    foreach (var aprop in a.GetType().GetProperties())
                                                     {
-                                                        DBTagAlarmHandler.Update(context, a.Id, aprop.Name, aprop.GetValue(a), a);
+                                                        if (aprop.Name != "Tag" && !object.Equals(aprop.GetValue(a), aprop.GetValue(basea)))
+                                                        {
+                                                            DBTagAlarmHandler.Update(context, a.Id, aprop.Name, aprop.GetValue(a), a);
+                                                        }
                                                     }
                                                 }
-                                            }
-                                            else
-                                            {
-                                                DBTagAlarmHandler.Create(context, a);
-                                                List<DBModel.Alarm> tagAl = DIitem.Alarms.ToList();
-                                                tagAl.Add(a);
-                                                DBTagHandler.UpdateTag(context, DIitem.Name, "Alarms", tagAl, DIitem);
-                                            }
-                                        }
-
-                                        var ala = baseAlarms.Where(n => !ids.Contains(n.Id)).ToList();
-                                        foreach (var item in ala)
-                                        {
-                                            DBTagAlarmHandler.Delete(context, item.Id, item);
-
-                                        }
-                                    }
-                                    else if (!object.Equals(prop.GetValue(DIitem), prop.GetValue(baseTag)))
-                                    {
-                                        DBTagHandler.UpdateTag(context, baseTag.Name, prop.Name, prop.GetValue(DIitem), DIitem);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                DBTagHandler.CreateTag(context, DIitem);
-                            }
-                        }
-                        break;
-                    case "AI":
-                        DBModel.AI AIitem = (DBModel.AI)AIser.Deserialize(tag.CreateReader());
-                        tagNames.Add(AIitem.Name);
-                        using (DBModel.IOContext context = new DBModel.IOContext())
-                        {
-                            var baseTag = DBTagHandler.FindTag<DBModel.AI>(context, AIitem.Name);
-                            
-
-                            if (baseTag != null)
-                            {
-                                List<DBModel.Alarm> baseAlarms = null;
-                                if (baseTag.Alarms.Count > 0)
-                                    baseAlarms = baseTag.Alarms.ToList();
-
-                                foreach (var prop in baseTag.GetType().GetProperties())
-                                {
-                                    if (prop.Name == "Alarms")
-                                    {
-                                        List<int> ids = new List<int>();
-                                        foreach (var a in AIitem.Alarms)
-                                        {
-                                            ids.Add(a.Id);
-                                            var basea = baseAlarms.Where(n => n.Id == a.Id).FirstOrDefault();
-                                            if (basea != default(DBModel.Alarm))
-                                            {
-                                                foreach (var aprop in a.GetType().GetProperties())
+                                                else
                                                 {
-                                                    if (aprop.Name != "Tag" && !object.Equals(aprop.GetValue(a), aprop.GetValue(basea)))
-                                                    {
-                                                        DBTagAlarmHandler.Update(context, a.Id, aprop.Name, aprop.GetValue(a), a);
-                                                    }
+                                                    DBTagAlarmHandler.Create(context, a);
+                                                    List<DBModel.Alarm> tagAl = DIitem.Alarms.ToList();
+                                                    tagAl.Add(a);
+                                                    DBTagHandler.UpdateTag(context, DIitem.Name, "Alarms", tagAl, DIitem);
                                                 }
                                             }
-                                            else
-                                            {
-                                                DBTagAlarmHandler.Create(context, a);
-                                                List<DBModel.Alarm> tagAl = AIitem.Alarms.ToList();
-                                                tagAl.Add(a);
-                                                DBTagHandler.UpdateTag(context, AIitem.Name, "Alarms", tagAl, AIitem);
-                                            }
-                                        }
 
-                                        if (ids.Count > 0)
-                                        {
                                             var ala = baseAlarms.Where(n => !ids.Contains(n.Id)).ToList();
                                             foreach (var item in ala)
                                             {
@@ -277,83 +236,152 @@ namespace DataConcentrator
 
                                             }
                                         }
-                                        
-                                    }
-                                    else if (!object.Equals(prop.GetValue(AIitem), prop.GetValue(baseTag)))
-                                    {
-                                        DBTagHandler.UpdateTag(context, baseTag.Name, prop.Name, prop.GetValue(AIitem), baseTag);
+                                        else if (!object.Equals(prop.GetValue(DIitem), prop.GetValue(baseTag)))
+                                        {
+                                            DBTagHandler.UpdateTag(context, baseTag.Name, prop.Name, prop.GetValue(DIitem), DIitem);
+                                        }
                                     }
                                 }
-                            }
-                            else
-                            {
-                                DBTagHandler.CreateTag(context, AIitem);
-                            }
-                        }
-                        break;
-                    case "DO":
-                        DBModel.DO DOitem = (DBModel.DO)DOser.Deserialize(tag.CreateReader());
-                        tagNames.Add(DOitem.Name);
-                        using (DBModel.IOContext context = new DBModel.IOContext())
-                        {
-                            var baseTag = DBTagHandler.FindTag<DBModel.DO>(context, DOitem.Name);
-                            if (baseTag != null)
-                            {
-                                foreach (var prop in baseTag.GetType().GetProperties())
+                                else
                                 {
-                                    if (!object.Equals(prop.GetValue(DOitem), prop.GetValue(baseTag)))
-                                    {
-                                        DBTagHandler.UpdateTag(context, baseTag.Name, prop.Name, prop.GetValue(DOitem), baseTag);
-                                    }
+                                    DBTagHandler.CreateTag(context, DIitem);
                                 }
                             }
-                            else
+                            break;
+                        case "AI":
+                            DBModel.AI AIitem = (DBModel.AI)AIser.Deserialize(tag.CreateReader());
+                            tagNames.Add(AIitem.Name);
+                            using (DBModel.IOContext context = new DBModel.IOContext())
                             {
-                                DBTagHandler.CreateTag(context, DOitem);
-                            }
-                        }
-                        break;
-                    case "AO":
-                        DBModel.AO AOitem = (DBModel.AO)AOser.Deserialize(tag.CreateReader());
-                        tagNames.Add(AOitem.Name);
-                        using (DBModel.IOContext context = new DBModel.IOContext())
-                        {
-                            var baseTag = DBTagHandler.FindTag<DBModel.AO>(context, AOitem.Name);
-                            if (baseTag != null)
-                            {
-                                foreach (var prop in baseTag.GetType().GetProperties())
+                                var baseTag = DBTagHandler.FindTag<DBModel.AI>(context, AIitem.Name);
+
+                                if (baseTag != null)
                                 {
-                                    if (!object.Equals(prop.GetValue(AOitem), prop.GetValue(baseTag)))
+                                    List<DBModel.Alarm> baseAlarms = new List<Alarm>();
+                                    if (baseTag.Alarms.Count > 0)
+                                        baseAlarms = baseTag.Alarms.ToList();
+
+                                    foreach (var prop in baseTag.GetType().GetProperties())
                                     {
-                                        DBTagHandler.UpdateTag(context, baseTag.Name, prop.Name, prop.GetValue(AOitem), baseTag);
+                                        if (prop.Name == "Alarms")
+                                        {
+                                            List<int> ids = new List<int>();
+                                            foreach (var a in AIitem.Alarms)
+                                            {
+                                                ids.Add(a.Id);
+                                                var basea = baseAlarms.Where(n => n.Id == a.Id).FirstOrDefault();
+                                                if (basea != default(DBModel.Alarm))
+                                                {
+                                                    foreach (var aprop in a.GetType().GetProperties())
+                                                    {
+                                                        if (aprop.Name != "Tag" && !object.Equals(aprop.GetValue(a), aprop.GetValue(basea)))
+                                                        {
+                                                            DBTagAlarmHandler.Update(context, a.Id, aprop.Name, aprop.GetValue(a), a);
+                                                        }
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    DBTagAlarmHandler.Create(context, a);
+                                                    List<DBModel.Alarm> tagAl = AIitem.Alarms.ToList();
+                                                    tagAl.Add(a);
+                                                    DBTagHandler.UpdateTag(context, AIitem.Name, "Alarms", tagAl, AIitem);
+                                                }
+                                            }
+
+                                            if (ids.Count > 0)
+                                            {
+                                                var ala = baseAlarms.Where(n => !ids.Contains(n.Id)).ToList();
+                                                foreach (var item in ala)
+                                                {
+                                                    DBTagAlarmHandler.Delete(context, item.Id, item);
+
+                                                }
+                                            }
+
+                                        }
+                                        else if (!object.Equals(prop.GetValue(AIitem), prop.GetValue(baseTag)))
+                                        {
+                                            DBTagHandler.UpdateTag(context, baseTag.Name, prop.Name, prop.GetValue(AIitem), baseTag);
+                                        }
                                     }
                                 }
+                                else
+                                {
+                                    DBTagHandler.CreateTag(context, AIitem);
+                                }
                             }
-                            else
+                            break;
+                        case "DO":
+                            DBModel.DO DOitem = (DBModel.DO)DOser.Deserialize(tag.CreateReader());
+                            tagNames.Add(DOitem.Name);
+                            using (DBModel.IOContext context = new DBModel.IOContext())
                             {
-                                DBTagHandler.CreateTag(context, AOitem);
+                                var baseTag = DBTagHandler.FindTag<DBModel.DO>(context, DOitem.Name);
+                                if (baseTag != null)
+                                {
+                                    foreach (var prop in baseTag.GetType().GetProperties())
+                                    {
+                                        if (!object.Equals(prop.GetValue(DOitem), prop.GetValue(baseTag)))
+                                        {
+                                            DBTagHandler.UpdateTag(context, baseTag.Name, prop.Name, prop.GetValue(DOitem), baseTag);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    DBTagHandler.CreateTag(context, DOitem);
+                                }
                             }
-                        }
-                        break;
+                            break;
+                        case "AO":
+                            DBModel.AO AOitem = (DBModel.AO)AOser.Deserialize(tag.CreateReader());
+                            tagNames.Add(AOitem.Name);
+                            using (DBModel.IOContext context = new DBModel.IOContext())
+                            {
+                                var baseTag = DBTagHandler.FindTag<DBModel.AO>(context, AOitem.Name);
+                                if (baseTag != null)
+                                {
+                                    foreach (var prop in baseTag.GetType().GetProperties())
+                                    {
+                                        if (!object.Equals(prop.GetValue(AOitem), prop.GetValue(baseTag)))
+                                        {
+                                            DBTagHandler.UpdateTag(context, baseTag.Name, prop.Name, prop.GetValue(AOitem), baseTag);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    DBTagHandler.CreateTag(context, AOitem);
+                                }
+                            }
+                            break;
+                    }
+
+
                 }
 
-               
-            }
-
-            if (tagNames.Count > 0)
-            {
-                using (DBModel.IOContext context = new DBModel.IOContext())
+                if (tagNames.Count > 0)
                 {
-                    var items = context.Tags.Where(n => !tagNames.Contains(n.Name)).ToList();
-                    foreach (var item in items)
+                    using (DBModel.IOContext context = new DBModel.IOContext())
                     {
-                        DBTagHandler.DeleteTag(context, item.Name, item);
+                        var items = context.Tags.Where(n => !tagNames.Contains(n.Name)).ToList();
+                        foreach (var item in items)
+                        {
+                            DBTagHandler.DeleteTag(context, item.Name, item);
 
+                        }
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show("[WARNING] XML file could not be deserialized. Different local databse found. Application will be started with current databse state");
+                //MessageBox.Show(ex.Message.ToString());
+            }
 
-            
+
+
         }
 
     }
